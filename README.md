@@ -1,0 +1,65 @@
+# Bot Meter for X
+
+A Chrome extension that shows how often each X (Twitter) account posts, right in your feed:
+
+**posts per day = total posts ÷ account age**
+
+An account that has averaged 200 posts a day for years is very likely automated.
+
+- A badge next to every author name in timelines, threads, search, and quoted posts, e.g. `66/day`
+  - grey: normal
+  - amber: high rate (default ≥ 50/day)
+  - red: likely bot (default ≥ 150/day)
+- A larger badge on profile pages: `≈ 66 posts/day · 109,671 posts in 4.5 years`
+- Hover any badge for details: total posts, account age, join date, followers/following, media count.
+- Posts from likely bots can be **labelled**, **dimmed** (the default), or **collapsed** behind a "Show" button.
+- Thresholds and behavior are configurable from the toolbar popup.
+
+## Install (developer mode)
+
+1. Open `chrome://extensions`
+2. Turn on **Developer mode** (top right)
+3. Click **Load unpacked** and select this folder
+4. Open or reload x.com
+
+Works in Chrome, Edge, Brave and other Chromium browsers (Chrome 111+).
+
+## How it works
+
+X's web app already has each account's post count on the page for every post it shows. The
+extension doesn't make any requests of its own and needs no API key:
+
+- `src/inject.js` runs in the page before X's code and reads the data X already receives:
+  - **first page load:** X server-renders and streams its data into inline scripts that write
+    into `self.$R.tsr`; the extension traps that array and reads each object as it lands.
+  - **after that** (scrolling, navigating): responses from `api.x.com/graphql/...` are read as they
+    arrive by wrapping `fetch`/`XMLHttpRequest`.
+- **Join date:** X doesn't send join dates with posts (only on profile pages), so the account age
+  comes from the account's numeric ID. IDs since ~April 2016 are Snowflake IDs with the creation
+  time built in (exact). Older, sequential IDs are interpolated between ~90 known accounts
+  (accurate to within a few months); the tooltip marks those dates with "≈".
+- `src/content.js` receives the stats via `postMessage`, finds each author's `@handle` link on the
+  page (skipping @mentions inside post text), and adds the badges.
+
+Nothing is stored or sent anywhere. Only your settings are saved, in `chrome.storage.sync`.
+
+## Caveats
+
+- X's post count **includes replies and reposts**, so very active humans (reply-guys, news
+  aggregators, live-tweeters) can legitimately hit 50–100/day. Treat the badge as a signal, not a verdict.
+- X rewrote its web app in 2026 (the "x-web" client: no more `data-testid` attributes, new API field
+  names). This version targets that client. If X changes it again, the field names in
+  `src/inject.js` and the `@handle` link matching in `src/content.js` are what to update.
+
+## Development
+
+```
+npm test                              # unit tests (Node 18+)
+python3 -m http.server 8765           # then open http://127.0.0.1:8765/test/harness.html
+```
+
+`test/pages/` holds real server-rendered x.com pages; `test/ssr.test.js` replays their inline
+scripts through `inject.js`. `test/anchors.json` is the ID → join-date data behind the estimates.
+
+`test/harness.html` loads the real extension scripts against a mock X page, so you can check the
+badge, dim and collapse behavior without logging in to X.

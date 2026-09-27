@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Bot Meter for X</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="../icons/icon32.png" alt="" width="24" height="24" />
+      <h1>Bot Meter for X</h1>
+    </header>
+
+    <form id="form">
+      <label class="row">
+        <span>Enabled</span>
+        <input type="checkbox" name="enabled" />
+      </label>
+
+      <label class="row">
+        <span>Badge on every account<small>Off: only flag high-rate accounts</small></span>
+        <input type="checkbox" name="showAll" />
+      </label>
+
+      <label class="row">
+        <span><i class="dot warn"></i>High rate at</span>
+        <span class="num"><input type="number" name="warnRate" min="1" step="1" /> /day</span>
+      </label>
+
+      <label class="row">
+        <span><i class="dot bot"></i>Likely bot at</span>
+        <span class="num"><input type="number" name="botRate" min="1" step="1" /> /day</span>
+      </label>
+
+      <label class="row">
+        <span>Posts from likely bots</span>
+        <select name="botAction">
+          <option value="label">Just label</option>
+          <option value="dim">Dim</option>
+          <option value="collapse">Collapse</option>
+        </select>
+      </label>
+    </form>
+
+    <p class="note">
+      Rate = total posts ÷ account age. X counts replies and reposts as posts, so very
+      active humans can reach 50+/day. Treat the badge as a hint, not proof.
+    </p>
+
+    <footer>
+      <a href="https://x.com/buildwithSud" target="_blank" rel="noopener">@buildwithSud</a>
+      <span aria-hidden="true">·</span>
+      <a href="https://buymeacoffee.com/sudarshanhosalli" target="_blank" rel="noopener">Buy me a coffee ☕</a>
+    </footer>
+
+    <script src="settings.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
