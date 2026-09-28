@@ -127,19 +127,20 @@ test('ignores non-API requests', () => {
 
 test('computes posts/day and levels', () => {
   const { ctx } = sandbox();
-  const { computeStats, formatRate, formatAge } = ctx.BotMeterStats;
+  const { computeStats, formatBadge, formatPhrase, formatAge } = ctx.BotMeterStats;
   const settings = { warnRate: 50, botRate: 150 };
   const now = Date.parse('2026-03-21T10:00:00Z');
 
   const misha = computeStats({ createdAt: 'Mon Mar 21 10:00:00 +0000 2022', statuses: 109671 }, settings, now);
   assert.strictEqual(Math.round(misha.ageDays), 1461);
-  assert.strictEqual(formatRate(misha.rate), '75');
+  assert.strictEqual(formatBadge(misha.rate), '75/day');
+  assert.strictEqual(formatPhrase(misha.rate), '75 posts a day');
   assert.strictEqual(misha.level, 'warn');
   assert.strictEqual(formatAge(misha.ageDays), '4.0 years');
 
   const human = computeStats({ createdAt: 'Sat Jan 05 12:00:00 +0000 2013', statuses: 9000 }, settings, now);
   assert.strictEqual(human.level, 'ok');
-  assert.strictEqual(formatRate(human.rate), '1.9');
+  assert.strictEqual(formatBadge(human.rate), '2/day');
 
   const bot = computeStats({ createdAt: 'Thu Jan 01 00:00:00 +0000 2026', statuses: 107000 }, settings, now);
   assert.strictEqual(bot.level, 'bot');
@@ -149,6 +150,33 @@ test('computes posts/day and levels', () => {
   assert.strictEqual(fresh.rate, 40);
 
   assert.strictEqual(computeStats({ createdAt: 'garbage', statuses: 1 }, settings, now), null);
+});
+
+test('shows quiet accounts per week or month, in whole numbers', () => {
+  const { ctx } = sandbox();
+  const { formatBadge, formatPhrase } = ctx.BotMeterStats;
+  assert.strictEqual(formatBadge(412.4), '412/day');
+  assert.strictEqual(formatBadge(1.4), '1/day');
+  assert.strictEqual(formatPhrase(1.4), '1 post a day');
+  assert.strictEqual(formatBadge(0.3), '2/week'); // 2.1 a week
+  assert.strictEqual(formatPhrase(0.3), '2 posts a week');
+  assert.strictEqual(formatBadge(0.1), '3/month'); // 0.7 a week
+  assert.strictEqual(formatBadge(0.01), '<1/month');
+  assert.strictEqual(formatPhrase(0.01), 'less than 1 post a month');
+  assert.strictEqual(formatBadge(2500), '2,500/day');
+});
+
+test('reports replies, reposts and quotes', async () => {
+  const { window, posted } = sandbox();
+  await window.fetch('https://api.x.com/graphql/abc123/HomeTimeline', xwebTimeline);
+  await flush();
+  const posts = Object.fromEntries(posted.flatMap((m) => m.posts).map((p) => [p.id, { ...p }]));
+  assert.deepStrictEqual(posts['22'], { id: '22', reply: false, repostOf: '23', quotedId: null, quotedAuthor: null });
+  assert.deepStrictEqual(posts['24'], { id: '24', reply: true, repostOf: null, quotedId: null, quotedAuthor: null });
+  assert.deepStrictEqual(posts['25'], { id: '25', reply: false, repostOf: null, quotedId: '26', quotedAuthor: 'quoted_person' });
+  // Plain posts aren't reported.
+  assert.strictEqual(posts['20'], undefined);
+  assert.strictEqual(posts['23'], undefined);
 });
 
 test('derives join dates from account IDs', () => {

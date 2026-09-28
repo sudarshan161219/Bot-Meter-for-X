@@ -3,12 +3,16 @@
 (() => {
   const SOURCE = 'bot-meter-x';
   const DEFAULTS = globalThis.BOT_METER_DEFAULTS;
-  const { computeStats, formatRate, formatAge, describe } = globalThis.BotMeterStats;
+  const { computeStats, formatBadge, formatPhrase, formatAge, describe } = globalThis.BotMeterStats;
   const HANDLE_RE = /^[A-Za-z0-9_]{1,15}$/;
   const PROFILE_TABS = new Set(['with_replies', 'media', 'reposts', 'highlights', 'articles', 'likes', 'superfollows', 'affiliates']);
 
   const users = new Map(); // lowercased handle -> user record from inject.js
   const revealed = new Set(); // handles the viewer chose to show despite "collapse"
+  // Post kinds, keyed by the post ID that appears in the page's /status/<id> links.
+  const replies = new Set(); // IDs of replies
+  const reposts = new Set(); // IDs of posts that showed up as someone's repost
+  const quotedAuthorOf = new Map(); // quoting post ID -> lowercased author of the quoted post
   let settings = { ...DEFAULTS };
   let scanTimer = null;
 
@@ -44,6 +48,21 @@
       }
       users.set(key, merged);
     }
+    for (const p of Array.isArray(data.posts) ? data.posts : []) {
+      if (!p || typeof p.id !== 'string') continue;
+      if (p.reply === true && !replies.has(p.id)) {
+        replies.add(p.id);
+        changed = true;
+      }
+      if (typeof p.repostOf === 'string' && !reposts.has(p.repostOf)) {
+        reposts.add(p.repostOf);
+        changed = true;
+      }
+      if (typeof p.quotedAuthor === 'string' && !quotedAuthorOf.has(p.id)) {
+        quotedAuthorOf.set(p.id, p.quotedAuthor.toLowerCase());
+        changed = true;
+      }
+    }
     if (changed) scheduleScan();
   });
 
@@ -58,30 +77,73 @@
   }
 
   function scan() {
-    // Every author "@handle" link: posts, quoted posts, replies, user lists, hover cards.
+    const focalId = location.pathname.match(/\/status\/(\d+)/)?.[1];
     const decorated = new Set();
-    for (const link of document.querySelectorAll('a[href^="/"]')) {
-      const handle = authorHandle(link);
-      if (!handle) continue;
-      decorated.add(decorateHandleLink(link, handle));
+    const handled = new Set();
+
+    for (const article of document.querySelectorAll('article')) {
+      // Author links that belong to this post (not to a nested quoted post).
+      const links = [];
+      for (const link of article.querySelectorAll('a[href^="/"]')) {
+        if (link.closest('article') !== article) continue;
+        const handle = authorHandle(link);
+        if (handle) links.push({ link, handle });
+      }
+      const author = links[0]?.handle ?? null;
+      const id = postId(article, author);
+      const checked = isChecked(postKind(article, id, focalId));
+      const quotedAuthor = id ? quotedAuthorOf.get(id) : undefined;
+      links.forEach(({ link, handle }, i) => {
+        handled.add(link);
+        // Later author links in a post are usually the quoted post's author.
+        const on = i > 0 && handle.toLowerCase() === quotedAuthor ? settings.onQuotes : checked;
+        decorated.add(decorateHandleLink(link, on ? handle : null));
+      });
+      // Only the post's own author decides dimming/collapsing.
+      syncArticle(article, author, checked ? lookup(author) : null);
     }
+
+    // Author links outside posts: user lists, hover cards, "who to follow".
+    for (const link of document.querySelectorAll('a[href^="/"]')) {
+      if (handled.has(link)) continue;
+      const handle = authorHandle(link);
+      if (handle) decorated.add(decorateHandleLink(link, handle));
+    }
+
     // Drop badges whose link X re-rendered or removed.
     for (const badge of document.querySelectorAll('.bm-badge:not(.bm-profile)')) {
       if (!decorated.has(badge)) badge.remove();
     }
 
-    // Dim/collapse posts by their own author (first author link in the post).
-    for (const article of document.querySelectorAll('article')) {
-      let handle = null;
-      for (const link of article.querySelectorAll('a[href^="/"]')) {
-        if (link.closest('article') !== article) continue;
-        handle = authorHandle(link);
-        if (handle) break;
-      }
-      syncArticle(article, handle, lookup(handle));
-    }
-
     decorateProfile();
+  }
+
+  // The post's own ID, from its permalink (/<author>/status/<id>).
+  function postId(article, author) {
+    if (!author) return null;
+    const prefix = `/${author.toLowerCase()}/status/`;
+    for (const a of article.querySelectorAll('a[href*="/status/"]')) {
+      if (a.closest('article') !== article) continue;
+      const href = a.getAttribute('href').toLowerCase();
+      if (href.startsWith(prefix)) return href.slice(prefix.length).match(/^\d+/)?.[0] ?? null;
+    }
+    return null;
+  }
+
+  function postKind(article, id, focalId) {
+    if (article.parentElement?.closest('article')) return 'quote';
+    // The post a thread page is about is always checked, whatever it is.
+    if (!id || id === focalId) return null;
+    if (reposts.has(id)) return 'repost';
+    if (replies.has(id)) return 'reply';
+    return null;
+  }
+
+  function isChecked(kind) {
+    if (kind === 'reply') return settings.onReplies;
+    if (kind === 'repost') return settings.onReposts;
+    if (kind === 'quote') return settings.onQuotes;
+    return true;
   }
 
   function lookup(handle) {
@@ -102,18 +164,44 @@
     return handle;
   }
 
+  // The badge goes right after the @handle, but only inside a container that
+  // lays its children out on one line. Some layouts (e.g. ads) wrap the handle
+  // in a column, where a sibling badge would drop onto its own line; there we
+  // climb to the enclosing name/handle row and sit next to it instead.
+  const anchors = new WeakMap();
+  function badgeAnchor(link) {
+    let anchor = anchors.get(link);
+    if (anchor) return anchor;
+    anchor = link;
+    for (let el = link, i = 0; i < 4 && el.parentElement; i++, el = el.parentElement) {
+      const parent = getComputedStyle(el.parentElement);
+      const oneLine = parent.display.endsWith('flex')
+        ? parent.flexDirection === 'row' &&
+          parent.flexWrap === 'nowrap' &&
+          /^(normal|flex-start|start|left)$/.test(parent.justifyContent)
+        : !getComputedStyle(el).display.startsWith('block');
+      if (oneLine) {
+        anchor = el;
+        break;
+      }
+    }
+    anchors.set(link, anchor);
+    return anchor;
+  }
+
   // Returns the badge element (or null) so scan() can remove stale ones.
   function decorateHandleLink(link, handle) {
     const found = lookup(handle);
     const show = found && (settings.showAll || found.stats.level !== 'ok');
-    const next = link.nextElementSibling;
+    const anchor = badgeAnchor(link);
+    const next = anchor.nextElementSibling;
     const existing = next?.classList.contains('bm-badge') ? next : null;
     return syncBadge(
       existing,
-      (badge) => link.after(badge),
+      (badge) => anchor.after(badge),
       show && {
         className: `bm-badge bm-${found.stats.level}`,
-        text: `${formatRate(found.stats.rate)}/day`,
+        text: formatBadge(found.stats.rate),
         title: describe(found.user, found.stats),
       }
     );
@@ -141,7 +229,7 @@
     syncBadge(existing, (badge) => anchor.after(badge), {
       className: `bm-badge bm-profile bm-${found.stats.level}`,
       text:
-        `≈ ${formatRate(found.stats.rate)} posts/day · ` +
+        `About ${formatPhrase(found.stats.rate)} · ` +
         `${found.user.statuses.toLocaleString('en-US')} posts in ${formatAge(found.stats.ageDays)}`,
       title: describe(found.user, found.stats),
     });
@@ -199,7 +287,7 @@
       notice.append(button);
       article.parentElement.insertBefore(notice, article);
     }
-    const text = `Hidden post from @${found.user.screenName}: ≈ ${formatRate(found.stats.rate)} posts/day, likely a bot.`;
+    const text = `Hidden post from @${found.user.screenName}, who averages about ${formatPhrase(found.stats.rate)}: likely a bot.`;
     const label = notice.firstElementChild;
     if (label.textContent !== text) label.textContent = text;
     if (notice.title !== describe(found.user, found.stats)) notice.title = describe(found.user, found.stats);

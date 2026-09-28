@@ -69,9 +69,26 @@
     return { rate, ageDays, created, approx, level };
   }
 
-  function formatRate(rate) {
-    if (rate < 10) return rate.toFixed(1);
-    return Math.round(rate).toLocaleString('en-US');
+  // Averages as whole numbers people can picture: "3 a day", and for quiet
+  // accounts "2 a week" or "3 a month" rather than "0.3 a day".
+  function rateUnit(rate) {
+    if (rate >= 1) return { n: Math.round(rate), unit: 'day' };
+    if (rate * 7 >= 1) return { n: Math.round(rate * 7), unit: 'week' };
+    if (rate * 30 >= 1) return { n: Math.round(rate * 30), unit: 'month' };
+    return { n: 0, unit: 'month' };
+  }
+
+  // Badge text: "3/day", "2/week", "<1/month".
+  function formatBadge(rate) {
+    const { n, unit } = rateUnit(rate);
+    return n === 0 ? `<1/${unit}` : `${n.toLocaleString('en-US')}/${unit}`;
+  }
+
+  // Sentence form: "3 posts a day", "1 post a week", "less than 1 post a month".
+  function formatPhrase(rate) {
+    const { n, unit } = rateUnit(rate);
+    if (n === 0) return `less than 1 post a ${unit}`;
+    return `${n.toLocaleString('en-US')} post${n === 1 ? '' : 's'} a ${unit}`;
   }
 
   function formatAge(days) {
@@ -90,8 +107,8 @@
       ...(!stats.approx && { day: 'numeric' }),
     });
     const lines = [
-      `@${user.screenName}: ≈ ${formatRate(stats.rate)} posts/day`,
-      `${num(user.statuses)} posts over ${formatAge(stats.ageDays)} (joined ${stats.approx ? '≈ ' : ''}${joined})`,
+      `@${user.screenName} averages about ${formatPhrase(stats.rate)}`,
+      `${num(user.statuses)} posts in ${formatAge(stats.ageDays)} (joined ${stats.approx ? '≈ ' : ''}${joined})`,
     ];
     if (user.followers != null || user.following != null) {
       lines.push(`${num(user.followers)} followers · ${num(user.following)} following`);
@@ -99,9 +116,9 @@
     if (user.media != null) lines.push(`${num(user.media)} media posts`);
     if (stats.level === 'bot') lines.push('Very high posting rate: likely automated');
     else if (stats.level === 'warn') lines.push('High posting rate');
-    lines.push('(Post count includes replies and reposts)');
+    lines.push('Average = total posts ÷ days since joining. Counts replies and reposts.');
     return lines.join('\n');
   }
 
-  globalThis.BotMeterStats = { computeStats, joinDateFromId, formatRate, formatAge, describe };
+  globalThis.BotMeterStats = { computeStats, joinDateFromId, formatBadge, formatPhrase, formatAge, describe };
 })();

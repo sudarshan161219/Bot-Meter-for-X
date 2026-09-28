@@ -95,8 +95,35 @@
     return null;
   }
 
-  function collectUsers(root) {
+  // Tweets can arrive wrapped: { result: { __typename: 'TweetWithVisibilityResults', tweet: {...} } }.
+  function unwrapTweet(x) {
+    let t = x?.result ?? x;
+    if (t?.tweet) t = t.tweet;
+    return t && typeof t === 'object' ? t : null;
+  }
+
+  // Replies, reposts and quotes, so the content script can honor the
+  // "show badges on" toggles. Plain posts aren't reported.
+  function pickPost(node) {
+    if (typeof node.rest_id !== 'string' || !(node.__typename === 'Tweet' || node.core?.user_results)) return null;
+    const legacy = node.legacy;
+    const reply = Boolean(node.reply_to_results?.rest_id || legacy?.in_reply_to_status_id_str);
+    const original = unwrapTweet(legacy?.retweeted_status_results ?? legacy?.retweeted_status_result);
+    const quoted = unwrapTweet(node.quoted_tweet_results ?? node.quoted_status_result);
+    const quotedAuthor = quoted?.core?.user_results?.result;
+    if (!reply && !original?.rest_id && !quoted?.rest_id) return null;
+    return {
+      id: node.rest_id,
+      reply,
+      repostOf: original?.rest_id ?? null,
+      quotedId: quoted?.rest_id ?? null,
+      quotedAuthor: quotedAuthor?.core?.screen_name ?? quotedAuthor?.legacy?.screen_name ?? null,
+    };
+  }
+
+  function collect(root) {
     const found = new Map();
+    const posts = [];
     const stack = [root];
     const seen = new Set();
     while (stack.length) {
@@ -112,6 +139,8 @@
           for (const [k, v] of Object.entries(user)) if (v != null) merged[k] = v;
           found.set(key, merged);
         }
+        const post = pickPost(node);
+        if (post) posts.push(post);
       }
       for (const key in node) {
         let v;
@@ -123,13 +152,15 @@
         if (v && typeof v === 'object') stack.push(v);
       }
     }
-    return [...found.values()];
+    return { users: [...found.values()], posts };
   }
 
   function publish(data) {
     try {
-      const users = collectUsers(data);
-      if (users.length) window.postMessage({ source: SOURCE, type: 'users', users }, window.location.origin);
+      const { users, posts } = collect(data);
+      if (users.length || posts.length) {
+        window.postMessage({ source: SOURCE, type: 'users', users, posts }, window.location.origin);
+      }
     } catch {
       // Never let our parsing break the page.
     }

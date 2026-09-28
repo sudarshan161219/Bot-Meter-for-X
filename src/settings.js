@@ -8,4 +8,8 @@ globalThis.BOT_METER_DEFAULTS = {
   botRate: 150,
   // What to do with posts from accounts at/above botRate: 'label' | 'dim' | 'collapse'.
   botAction: 'dim',
+  // Which kinds of posts get checked. Off: no badge, never dimmed or collapsed.
+  onReplies: true,
+  onReposts: true,
+  onQuotes: true,
 };

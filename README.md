@@ -6,13 +6,15 @@ A Chrome extension that shows how often each X (Twitter) account posts, right in
 
 An account that has averaged 200 posts a day for years is very likely automated.
 
-- A badge next to every author name in timelines, threads, search, and quoted posts, e.g. `66/day`
+- A badge next to every author name in timelines, threads, search, and quoted posts, e.g. `66/day`.
+  It's an average in whole numbers; quiet accounts show per week or month (`2/week`, `3/month`)
   - grey: normal
   - amber: high rate (default ≥ 50/day)
   - red: likely bot (default ≥ 150/day)
-- A larger badge on profile pages: `≈ 66 posts/day · 109,671 posts in 4.5 years`
+- A larger badge on profile pages: `About 66 posts a day · 109,671 posts in 4.5 years`
 - Hover any badge for details: total posts, account age, join date, followers/following, media count.
 - Posts from likely bots can be **labelled**, **dimmed** (the default), or **collapsed** behind a "Show" button.
+- Choose which posts get checked: replies, reposts and quoted posts can each be switched off.
 - Thresholds and behavior are configurable from the toolbar popup.
 
 ## Install

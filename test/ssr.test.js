@@ -39,8 +39,12 @@ async function replay(page) {
   }
   await new Promise((r) => setTimeout(r, 10));
   const users = {};
-  for (const m of posted) for (const u of m.users) users[u.screenName] = u;
-  return { users, ran };
+  const posts = {};
+  for (const m of posted) {
+    for (const u of m.users) users[u.screenName] = u;
+    for (const p of m.posts) posts[p.id] = p;
+  }
+  return { users, posts, ran };
 }
 
 test('profile page: reads the profile owner from the SSR stream', async () => {
@@ -56,7 +60,11 @@ test('profile page: reads the profile owner from the SSR stream', async () => {
 });
 
 test('post page: reads the author and repliers', async () => {
-  const { users } = await replay('status-NASA.html');
+  const { users, posts } = await replay('status-NASA.html');
+  // The three replies under the post are flagged as replies; the post itself isn't.
+  const replyIds = Object.values(posts).filter((p) => p.reply).map((p) => p.id);
+  assert.strictEqual(replyIds.length, 3);
+  assert.ok(!replyIds.includes('2103610284464316469'));
   // (@mentioned accounts only come as bare mention entities, without counts.)
   for (const name of ['NASA', 'HFStudios2021', 'crazyPD_TX', 'pds1st']) {
     assert.ok(users[name], `${name} missing; got ${Object.keys(users)}`);

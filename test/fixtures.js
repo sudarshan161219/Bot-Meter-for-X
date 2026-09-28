@@ -72,6 +72,17 @@ const xwebAuthor = (screenName, restId, tweets) => ({
   verification: { is_blue_verified: true, verified: false },
 });
 
+// x-web post: kind markers are reply_to_results, legacy.retweeted_status_results
+// and quoted_tweet_results (field names from X's 2026 web client).
+const xwebTweet = (id, author, extra = {}, legacy = {}) => ({
+  __typename: 'Tweet',
+  rest_id: id,
+  core: { user_results: { result: author } },
+  legacy: { full_text: `post ${id}`, ...legacy },
+  ...extra,
+});
+const entry = (tweet) => ({ entryId: `tweet-${tweet.rest_id}`, content: { itemContent: { tweet_results: { result: tweet } } } });
+
 // x-web api.x.com/graphql/<id>/HomeTimeline response.
 const xwebTimeline = {
   data: {
@@ -82,6 +93,27 @@ const xwebTimeline = {
             entries: [
               tweetEntry('20', xwebAuthor('fresh_bot', '1880000000000000000', 250000)),
               tweetEntry('21', xwebAuthor('old_timer', '11348282', 5000)),
+              // @reposter reposted post 23 by @original_author.
+              entry(
+                xwebTweet('22', xwebAuthor('reposter', '1500000000000000000', 800), {}, {
+                  retweeted_status_results: {
+                    result: xwebTweet('23', xwebAuthor('original_author', '1400000000000000000', 3000)),
+                  },
+                })
+              ),
+              // A reply to post 20.
+              entry(xwebTweet('24', xwebAuthor('replier', '1600000000000000000', 1200), { reply_to_results: { rest_id: '20' } })),
+              // Post 25 quotes post 26 by @quoted_person (wrapped with visibility results).
+              entry(
+                xwebTweet('25', xwebAuthor('quoter', '1700000000000000000', 400), {
+                  quoted_tweet_results: {
+                    result: {
+                      __typename: 'TweetWithVisibilityResults',
+                      tweet: xwebTweet('26', xwebAuthor('quoted_person', '1300000000000000000', 90)),
+                    },
+                  },
+                })
+              ),
             ],
           },
         ],

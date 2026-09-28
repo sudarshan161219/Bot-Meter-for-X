@@ -20,6 +20,10 @@
       .head span:first-child a { color: #e7e9ea; font-weight: 700; }
       a { color: inherit; text-decoration: none; }
       [dir="auto"] a { color: #1d9bf0; }
+      .social { color: #71767b; font-size: 13px; }
+      .controls { flex-wrap: wrap; }
+      .col { display: flex; flex-direction: column; align-items: flex-start; }
+      .ad { margin-left: auto; }
       .quote { margin-top: 10px; padding: 10px 12px; border: 1px solid #2f3336; border-radius: 16px; }
     </style>
     <script>
@@ -66,6 +70,9 @@
           </select>
         </label>
         <label><input type="checkbox" id="showAll" checked /> Badge on every account</label>
+        <label><input type="checkbox" id="onReplies" checked /> Replies</label>
+        <label><input type="checkbox" id="onReposts" checked /> Reposts</label>
+        <label><input type="checkbox" id="onQuotes" checked /> Quotes</label>
       </div>
 
       <!-- Mirrors x-web (2026) markup: no data-testid; post text in dir="auto". -->
@@ -90,6 +97,29 @@
           <div dir="auto">quoted</div>
         </div>
       </article></div>
+      <!-- Kinds come from xwebTimeline: 24 is a reply, 23 was reposted, 25 quotes 26. -->
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/replier">REPLIER</a></span> <span><a href="/replier">@replier</a> · <a href="/replier/status/24"><time>4m</time></a></span></div>
+        <div dir="auto">A reply (post 24).</div>
+      </article></div>
+      <div data-timeline-entry=""><article>
+        <div class="social"><a href="/reposter">REPOSTER reposted</a></div>
+        <div class="head"><span><a href="/original_author">ORIGINAL_AUTHOR</a></span> <span><a href="/original_author">@original_author</a> · <a href="/original_author/status/23"><time>1h</time></a></span></div>
+        <div dir="auto">A post that appears as a repost (post 23).</div>
+      </article></div>
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/quoter">QUOTER</a></span> <span><a href="/quoter">@quoter</a> · <a href="/quoter/status/25"><time>9m</time></a></span></div>
+        <div dir="auto">A quote post (post 25):</div>
+        <div class="quote">
+          <div class="head"><span><a href="/quoted_person">@quoted_person</a></span> · <a href="/quoted_person/status/26"><time>2d</time></a></div>
+          <div dir="auto">the quoted post (26)</div>
+        </div>
+      </article></div>
+      <div data-timeline-entry=""><article>
+        <!-- Ad layout: the @handle sits in a column container, not a row. -->
+        <div class="head"><span><a href="/normal_human">NORMAL_HUMAN</a></span> <div class="col"><a href="/normal_human">@normal_human</a></div><span class="ad">Ad</span></div>
+        <div dir="auto">An ad post, where the handle is wrapped in a column.</div>
+      </article></div>
       <div data-timeline-entry=""><article>
         <div class="head"><span><a href="/unknown_user">UNKNOWN_USER</a></span> <span><a href="/unknown_user">@unknown_user</a> · <time>3d</time></span></div>
         <div dir="auto">No data for this account, so no badge.</div>
@@ -98,7 +128,9 @@
     </div>
     <script>
       document.getElementById('action').onchange = (e) => chrome.storage.sync.set({ botAction: e.target.value });
-      document.getElementById('showAll').onchange = (e) => chrome.storage.sync.set({ showAll: e.target.checked });
+      for (const id of ['showAll', 'onReplies', 'onReposts', 'onQuotes']) {
+        document.getElementById(id).onchange = (e) => chrome.storage.sync.set({ [id]: e.target.checked });
+      }
       // Pretend we're on the mishabot profile so the profile badge shows (reload via /test/harness.html).
       history.replaceState(null, '', '/mishabot');
       fetch('/i/api/graphql/abc/HomeTimeline');

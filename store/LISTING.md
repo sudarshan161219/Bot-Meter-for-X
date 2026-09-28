@@ -28,12 +28,14 @@ Bot Meter divides an account's total posts by its age. A real person usually pos
 
 FEATURES
 • Posts-per-day badge next to every author: home timeline, replies, quoted posts, search results and profiles
+• Easy to read: an average in whole numbers, like 3/day, and 2/week or 3/month for quiet accounts
 • Color-coded at a glance: grey for normal, amber for a high posting rate (50+ per day), red for likely bots (150+ per day)
 • Adjustable thresholds, so you decide what counts as a bot
 • Hover a badge to see total posts, account age, join date, followers and following
-• Profile badge, e.g. "≈ 66 posts/day · 109,671 posts in 4.5 years"
+• Profile badge, e.g. "About 66 posts a day · 109,671 posts in 4.5 years"
 • Deal with bot posts your way: label them, dim them, or collapse them behind a "Show" button
 • Quiet mode: only badge high-frequency accounts
+• Choose what gets checked: switch replies, reposts or quoted posts on or off
 • Works in reply threads, where bot replies pile up the most
 
 PRIVATE AND LIGHTWEIGHT
