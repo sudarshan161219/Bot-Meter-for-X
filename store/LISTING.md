@@ -50,7 +50,7 @@ X counts replies and reposts as posts, so some very active real people, such as 
 
 Account age comes from the account's ID: exact for accounts created since 2016, and estimated to within a few months for older accounts (marked with "≈").
 
-Works on x.com (twitter.com links redirect there) in Chrome, Edge, Brave and other Chromium browsers.
+Works on x.com (twitter.com links redirect there) in Chrome, Brave and other Chromium browsers.
 
 Not affiliated with or endorsed by X Corp. "X" and "Twitter" are trademarks of X Corp., used here only to describe compatibility.
 

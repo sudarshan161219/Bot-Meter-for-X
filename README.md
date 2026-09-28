@@ -24,7 +24,7 @@ From the Chrome Web Store (link coming once the listing is approved), or in deve
 3. Click **Load unpacked** and select this folder
 4. Open or reload x.com
 
-Works in Chrome, Edge, Brave and other Chromium browsers (Chrome 111+).
+Works in Chrome, Brave and other Chromium browsers (Chrome 111+).
 
 ## How it works
 
