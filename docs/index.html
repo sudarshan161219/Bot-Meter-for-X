@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Bot Meter for X</title>
+    <meta name="description" content="Bot Meter is a free Twitter bot detector for X. It shows how many posts per day every account makes, right next to its name in your feed, so you can spot spam bots at a glance." />
+    <meta property="og:title" content="Bot Meter for X: Twitter Bot Detector" />
+    <meta property="og:description" content="See how many posts per day every X account makes, right in your feed. Spot, dim or hide spam bots." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="assets/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="./"><img src="assets/icon128.png" alt="" />Bot Meter</a>
+        <nav aria-label="Site">
+          <a class="hide-sm" href="#how">How it works</a>
+          <a class="hide-sm" href="#faq">FAQ</a>
+          <a href="privacy.html">Privacy</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div>
+            <p class="eyebrow">Chrome extension for X</p>
+            <h1>How many posts a day is too many?</h1>
+            <p class="lede">
+              Bot Meter puts each account's average posts per day right next to its name in your X feed.
+              A person posts a few times a day. An account that has averaged 400 a day since it was created
+              is almost certainly a bot.
+            </p>
+            <div class="actions">
+              <!-- Swap this href for the Chrome Web Store listing once it's approved. -->
+              <a class="cta" href="https://github.com/sudarshan161219/Bot-Meter-for-X#install">Get Bot Meter, free</a>
+              <span class="note">Chrome, Edge, Brave · no login, no tracking</span>
+            </div>
+          </div>
+
+          <div class="feed" aria-label="Example X feed with Bot Meter badges">
+            <div class="post">
+              <div class="avatar av1" aria-hidden="true"></div>
+              <div>
+                <div class="post-head"><b>Maya Chen</b><span class="handle">@maya_writes</span><span class="badge ok">2.1/day</span></div>
+                <p>Finally finished the first draft of the novel. Going to sleep for a week.</p>
+              </div>
+            </div>
+            <div class="post">
+              <div class="avatar av2" aria-hidden="true"></div>
+              <div>
+                <div class="post-head"><b>Newsdesk Daily</b><span class="handle">@newsdesk_daily</span><span class="badge warn">72/day</span></div>
+                <p>Live updates: the council votes on the new transit plan tonight.</p>
+              </div>
+            </div>
+            <div class="post dim">
+              <div class="avatar av3" aria-hidden="true"></div>
+              <div>
+                <div class="post-head"><b>ALPHA SIGNALS</b><span class="handle">@cryptoalpha_x9</span><span class="badge bot">412/day</span></div>
+                <p>FREE 1000 USDT GIVEAWAY. Like, repost and follow, DM to claim!!</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="scale-section" aria-labelledby="scale-title">
+          <h2 id="scale-title">Where accounts land</h2>
+          <p class="section-lede">
+            Posts per day on a log scale. Most people sit far to the left. The colors are the same ones
+            the badge uses, and you can move both cut-offs in the settings.
+          </p>
+          <div class="scale-box">
+            <div class="scale">
+              <div class="pin" style="left: 11.9%"><small>occasional poster</small><span class="badge ok">0.3/day</span></div>
+              <div class="pin" style="left: 32.5%"><small>typical person</small><span class="badge ok">2/day</span></div>
+              <div class="pin" style="left: 71.1%"><small>busy news account</small><span class="badge warn">70/day</span></div>
+              <div class="pin" style="left: 90%"><small>spam bot</small><span class="badge bot">400/day</span></div>
+              <div class="track" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="ticks" aria-hidden="true">
+                <span style="left: 0">0.1</span>
+                <span style="left: 25%">1</span>
+                <span style="left: 50%">10</span>
+                <span style="left: 75%">100</span>
+                <span style="left: 100%">1,000/day</span>
+              </div>
+              <div class="zones">
+                <span><b>Normal</b> · under 50</span>
+                <span><b>High</b> · 50–150</span>
+                <span><b>Likely bot</b> · 150+</span>
+              </div>
+            </div>
+          </div>
+          <p class="scale-caption">
+            X counts replies and reposts as posts, so some very active real people reach 50–100 a day.
+            Treat amber as "look closer", not "bot".
+          </p>
+        </section>
+
+        <section class="band" id="how" aria-labelledby="how-title">
+          <h2 id="how-title">How it works</h2>
+          <p class="section-lede">No API key, no login, and no requests of its own. It reads what X has already loaded.</p>
+          <div class="formula" aria-label="Formula">
+            <span>posts per day</span><span class="eq">=</span><span>total posts</span><span class="eq">÷</span><span>days since the account joined</span>
+          </div>
+          <ol class="steps">
+            <li>
+              <h3>Reads what's already there</h3>
+              <p>X sends each author's post count and account ID to your browser along with every post. Bot Meter reads them as they arrive.</p>
+            </li>
+            <li>
+              <h3>Works out the account's age</h3>
+              <p>Account IDs since 2016 carry their creation time, so the join date is exact. Older accounts are estimated to within a few months, marked with ≈.</p>
+            </li>
+            <li>
+              <h3>Badges every author</h3>
+              <p>A badge appears next to each <code>@handle</code> in your timeline, replies, quotes, search and profiles. Hover it for the details.</p>
+            </li>
+          </ol>
+        </section>
+
+        <section class="band" aria-labelledby="yours-title">
+          <h2 id="yours-title">Your feed, your rules</h2>
+          <div class="facts">
+            <div>
+              <h3>Label, dim or collapse</h3>
+              <p>Decide what happens to posts from likely bots: just a red badge, faded out, or folded away behind a "Show" button.</p>
+            </div>
+            <div>
+              <h3>Set your own thresholds</h3>
+              <p>"High rate" starts at 50 a day and "likely bot" at 150 by default. Change either number in the popup.</p>
+            </div>
+            <div>
+              <h3>Quiet mode</h3>
+              <p>Only want to hear about the suspicious ones? Turn off badges for normal accounts and only high-rate accounts get marked.</p>
+            </div>
+            <div>
+              <h3>Private by design</h3>
+              <p>Nothing is collected, stored or sent anywhere. Only your settings are saved. <a href="privacy.html">Read the privacy policy</a>.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="band" id="faq" aria-labelledby="faq-title">
+          <h2 id="faq-title">Questions</h2>
+          <div class="faq">
+            <details>
+              <summary>Is a high number proof that an account is a bot?</summary>
+              <p>No. It's a strong signal, not a verdict. News outlets, live-tweeters and people who reply a lot can legitimately post 50–100 times a day. Accounts averaging hundreds a day for months are a different story.</p>
+            </details>
+            <details>
+              <summary>Does it need my X login or an API key?</summary>
+              <p>No. It works with the X page you already have open and never touches your account, messages or password.</p>
+            </details>
+            <details>
+              <summary>Does it slow X down or use data?</summary>
+              <p>No. It makes no network requests; it only reads numbers X has already sent to your browser and adds small badges.</p>
+            </details>
+            <details>
+              <summary>Why is an older account's join date marked ≈?</summary>
+              <p>X doesn't include join dates with posts. For accounts created before 2016, the date is estimated from the account ID and is accurate to within a few months. Newer accounts get an exact date.</p>
+            </details>
+            <details>
+              <summary>Which browsers does it work in?</summary>
+              <p>Chrome, Edge, Brave and other Chromium browsers, on x.com.</p>
+            </details>
+          </div>
+        </section>
+      </main>
+
+      <footer class="foot">
+        <span>Bot Meter is not affiliated with or endorsed by X Corp.</span>
+        <nav aria-label="Footer">
+          <a href="privacy.html">Privacy policy</a>
+          <a href="https://github.com/sudarshan161219/Bot-Meter-for-X">Source on GitHub</a>
+          <a href="https://x.com/buildwithSud">@buildwithSud</a>
+          <a href="https://buymeacoffee.com/sudarshanhosalli">Buy me a coffee</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>

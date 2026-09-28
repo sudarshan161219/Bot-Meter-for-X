@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Store screenshot: feed</title>
+    <!-- Chrome Web Store screenshot (1280x800). Renders with the real content script.
+         Regenerate: npm run store:images -->
+    <link rel="stylesheet" href="../src/content.css" />
+    <link rel="stylesheet" href="store.css" />
+    <script>
+      window.chrome = { storage: { sync: { get: (d, cb) => cb({ ...d }) }, onChanged: { addListener() {} } } };
+    </script>
+    <script src="../src/settings.js"></script>
+    <script src="../src/stats.js"></script>
+    <script src="../src/content.js"></script>
+  </head>
+  <body>
+    <div class="shot">
+      <section class="pitch">
+        <img src="../icons/icon128.png" width="72" height="72" alt="" />
+        <h1>See how often every account posts</h1>
+        <p>Bot Meter adds a <b>posts-per-day</b> badge next to every author on X, from the data already on the page.</p>
+        <ul>
+          <li><span class="pill ok">2.1/day</span> normal</li>
+          <li><span class="pill warn">72/day</span> high rate</li>
+          <li><span class="pill bot">412/day</span> likely bot, dimmed</li>
+        </ul>
+      </section>
+
+      <main class="feed">
+        <article>
+          <div class="avatar a1"></div>
+          <div class="body">
+            <div class="head"><span><a href="/maya_writes">Maya Chen</a></span><span><a href="/maya_writes">@maya_writes</a> · <time>2h</time></span></div>
+            <div dir="auto">Finally finished the first draft of the novel. 94,000 words. Going to sleep for a week.</div>
+          </div>
+        </article>
+        <article>
+          <div class="avatar a3"></div>
+          <div class="body">
+            <div class="head"><span><a href="/newsdesk_daily">Newsdesk Daily</a></span><span><a href="/newsdesk_daily">@newsdesk_daily</a> · <time>12m</time></span></div>
+            <div dir="auto">Live updates: city council votes on the new transit plan tonight. Follow along here.</div>
+          </div>
+        </article>
+        <article>
+          <div class="avatar a4"></div>
+          <div class="body">
+            <div class="head"><span><a href="/sam_bakes">Sam Okafor</a></span><span><a href="/sam_bakes">@sam_bakes</a> · <time>5h</time></span></div>
+            <div dir="auto">Sourdough attempt #14. It finally has an ear. 🍞</div>
+          </div>
+        </article>
+        <article>
+          <div class="avatar a2"></div>
+          <div class="body">
+            <div class="head"><span><a href="/cryptoalpha_x9">ALPHA SIGNALS 🚀</a></span><span><a href="/cryptoalpha_x9">@cryptoalpha_x9</a> · <time>1m</time></span></div>
+            <div dir="auto">🚨 FREE 1000 USDT GIVEAWAY 🚨 Like + repost + follow, DM to claim!! Only 2 hours left!!!</div>
+          </div>
+        </article>
+        <div class="tip" id="tip"></div>
+      </main>
+    </div>
+    <script>
+      const now = Date.now();
+      // Snowflake-style IDs so join dates are exact: id = (ms - epoch) << 22.
+      const idFor = (daysAgo) => String((BigInt(now - daysAgo * 864e5) - 1288834974657n) << 22n);
+      const users = [
+        { screenName: 'maya_writes', restId: idFor(3100), statuses: 6500, followers: 2140, following: 530 },
+        { screenName: 'cryptoalpha_x9', restId: idFor(240), statuses: 98900, followers: 180, following: 4990 },
+        { screenName: 'newsdesk_daily', restId: idFor(2200), statuses: 158000, followers: 61200, following: 310 },
+        { screenName: 'sam_bakes', restId: idFor(1500), statuses: 2300, followers: 412, following: 388 },
+      ];
+      window.postMessage({ source: 'bot-meter-x', type: 'users', users }, '*');
+      // Show what hovering a badge reveals.
+      setTimeout(() => {
+        const s = BotMeterStats;
+        const u = users[1];
+        const st = s.computeStats(u, BOT_METER_DEFAULTS);
+        document.getElementById('tip').textContent = s.describe(u, st);
+        const badge = document.querySelector('a[href="/cryptoalpha_x9"] + .bm-badge');
+        const tip = document.getElementById('tip');
+        const r = badge.getBoundingClientRect();
+        const f = document.querySelector('.feed').getBoundingClientRect();
+        tip.style.left = `${r.left - f.left - 120}px`;
+        tip.style.top = `${r.bottom - f.top + 8}px`;
+        tip.classList.add('on');
+      }, 400);
+    </script>
+  </body>
+</html>

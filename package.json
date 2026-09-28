@@ -1,9 +1,11 @@
 {
   "name": "bot-meter-for-x",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "Chrome extension that shows posts/day for X accounts to flag likely bots.",
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "build": "rm -rf dist && mkdir -p dist && zip -r -X dist/bot-meter-x-$(node -p \"require('./manifest.json').version\").zip manifest.json icons src",
+    "store:images": "bash store/render.sh"
   }
 }

@@ -1,4 +1,4 @@
-# Bot Meter for X
+# Bot Meter for X: Twitter Bot Detector
 
 A Chrome extension that shows how often each X (Twitter) account posts, right in your feed:
 
@@ -15,7 +15,9 @@ An account that has averaged 200 posts a day for years is very likely automated.
 - Posts from likely bots can be **labelled**, **dimmed** (the default), or **collapsed** behind a "Show" button.
 - Thresholds and behavior are configurable from the toolbar popup.
 
-## Install (developer mode)
+## Install
+
+From the Chrome Web Store (link coming once the listing is approved), or in developer mode:
 
 1. Open `chrome://extensions`
 2. Turn on **Developer mode** (top right)
@@ -63,3 +65,17 @@ scripts through `inject.js`. `test/anchors.json` is the ID → join-date data be
 
 `test/harness.html` loads the real extension scripts against a mock X page, so you can check the
 badge, dim and collapse behavior without logging in to X.
+
+## Hosting the website
+
+`docs/` holds the landing page (`index.html`) and privacy policy (`privacy.html`), served by GitHub
+Pages:
+
+1. Push the repo to GitHub (the repo must be public for Pages on a free account).
+2. **Settings → Pages → Build and deployment**: Source "Deploy from a branch", branch `main`,
+   folder `/docs`.
+3. The site goes live at https://sudarshan161219.github.io/Bot-Meter-for-X/ and the privacy policy
+   at https://sudarshan161219.github.io/Bot-Meter-for-X/privacy.html (the URL to give the Chrome
+   Web Store).
+
+Once the store listing is approved, point the "Get Bot Meter" button in `docs/index.html` at it.

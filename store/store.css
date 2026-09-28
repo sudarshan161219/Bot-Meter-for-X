@@ -1,0 +1,145 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #0b0f14;
+  color: #e7e9ea;
+  font: 15px/20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+.shot {
+  width: 1280px;
+  height: 800px;
+  display: grid;
+  grid-template-columns: 500px 1fr;
+  align-items: center;
+  gap: 40px;
+  padding: 0 64px;
+  background: radial-gradient(circle at 15% 20%, #1a2330 0, #0b0f14 60%);
+  overflow: hidden;
+}
+
+.pitch h1 {
+  margin: 20px 0 14px;
+  font-size: 44px;
+  line-height: 50px;
+  letter-spacing: -0.5px;
+}
+
+.pitch p {
+  margin: 0 0 26px;
+  color: #a5adb5;
+  font-size: 20px;
+  line-height: 29px;
+}
+
+.pitch ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  font-size: 17px;
+  color: #c4cad0;
+}
+
+.pitch li { display: flex; align-items: center; gap: 12px; }
+.pitch li .pill { min-width: 76px; }
+
+/* Static copies of the badge look, for legends (the content script removes stray .bm-badge). */
+.pill {
+  display: inline-flex;
+  justify-content: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font: 600 13px/18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  white-space: nowrap;
+}
+.pill.ok { color: rgb(113, 118, 123); border-color: rgba(113, 118, 123, 0.45); }
+.pill.warn { color: #1a1300; background: #f5b400; }
+.pill.bot { color: #fff; background: #e0245e; }
+
+.feed {
+  position: relative;
+  width: 600px;
+  background: #000;
+  border: 1px solid #2f3336;
+  border-radius: 16px;
+  overflow: visible;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+.feed article {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid #2f3336;
+}
+
+.feed article:last-of-type { border-bottom: 0; }
+.feed { margin-top: -120px; }
+
+.avatar {
+  flex: 0 0 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.a1 { background: linear-gradient(135deg, #f7a8b8, #c56cf0); }
+.a2 { background: linear-gradient(135deg, #f5b400, #e0245e); }
+.a3 { background: linear-gradient(135deg, #1d9bf0, #0f4c81); }
+.a4 { background: linear-gradient(135deg, #7bd88f, #2f9e44); }
+
+.body { min-width: 0; }
+.head { display: flex; align-items: center; gap: 4px; color: #71767b; margin-bottom: 2px; }
+.head span { display: flex; align-items: center; gap: 4px; }
+.head span:first-child a { color: #e7e9ea; font-weight: 700; }
+a { color: inherit; text-decoration: none; }
+
+.tip {
+  position: absolute;
+  display: none;
+  white-space: pre-line;
+  width: 340px;
+  padding: 10px 12px;
+  background: #f7f9f9;
+  color: #0f1419;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 19px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.tip.on { display: block; }
+
+/* Promo tile */
+.tile {
+  width: 440px;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 36px;
+  background: radial-gradient(circle at 20% 15%, #1f2a38 0, #0b0f14 70%);
+}
+
+.tile .row { display: flex; align-items: center; gap: 14px; }
+.tile h1 { margin: 0; font-size: 30px; line-height: 34px; }
+.tile p { margin: 0; color: #a5adb5; font-size: 17px; line-height: 23px; }
+.tile .badges { display: flex; gap: 8px; }
+
+
+/* Settings screenshot */
+.popup-frame {
+  width: 334px;
+  justify-self: start;
+  border: 1px solid #2f3336;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+.popup-frame iframe { display: block; width: 334px; height: 408px; border: 0; }

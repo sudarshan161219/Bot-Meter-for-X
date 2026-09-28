@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Bot Meter Privacy Policy</title>
+    <meta name="description" content="Privacy policy for the Bot Meter for X browser extension. It collects no data, sends nothing anywhere, and stores only your settings." />
+    <link rel="icon" href="assets/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="./"><img src="assets/icon128.png" alt="" />Bot Meter</a>
+        <nav aria-label="Site">
+          <a href="./">Home</a>
+        </nav>
+      </header>
+
+      <main class="doc">
+        <h1>Privacy policy</h1>
+        <p class="updated">Effective September 28, 2026</p>
+
+        <div class="summary-box">
+          <p>
+            <strong>In short:</strong> Bot Meter for X collects no personal data, sends nothing anywhere,
+            and stores only your own settings.
+          </p>
+        </div>
+
+        <h2>Who this covers</h2>
+        <p>
+          This policy covers the Bot Meter for X browser extension ("Bot Meter", "the extension"), made by
+          Sudarshan (<a href="https://x.com/buildwithSud">@buildwithSud</a>). It applies to the extension
+          as published on the Chrome Web Store and in its public source repository.
+        </p>
+
+        <h2>What the extension reads</h2>
+        <p>
+          The extension runs only on <code>x.com</code>. There it reads account information that X has
+          already loaded into the page you're viewing:
+        </p>
+        <ul>
+          <li>each account's total post count</li>
+          <li>each account's numeric ID, used to work out when the account was created</li>
+          <li>follower and following counts, shown in the badge's hover details</li>
+        </ul>
+        <p>
+          It uses these only to calculate posts per day and draw a badge next to each account. All of this
+          happens inside your browser. The extension does not read your direct messages, your password,
+          your X login session, or any page outside x.com.
+        </p>
+
+        <h2>What the extension sends</h2>
+        <p>
+          Nothing. Bot Meter has no server, makes no network requests of its own, and includes no
+          analytics, advertising, tracking or crash-reporting code.
+        </p>
+
+        <h2>What the extension stores</h2>
+        <p>Only your settings, saved with Chrome's built-in <code>storage.sync</code>:</p>
+        <ul>
+          <li>whether the extension is turned on</li>
+          <li>your "high rate" and "likely bot" posts-per-day thresholds</li>
+          <li>whether to show a badge on every account</li>
+          <li>what to do with posts from likely bots (label, dim or collapse)</li>
+        </ul>
+        <p>
+          If you're signed in to Chrome with sync turned on, Chrome syncs these settings across your
+          browsers the same way it syncs your other extension settings. Account data and post content are
+          kept only in memory while the page is open and are never saved.
+        </p>
+
+        <h2>Permissions</h2>
+        <div class="table-box">
+          <table class="perm">
+            <thead>
+              <tr><th scope="col">Permission</th><th scope="col">Why it's needed</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>storage</code></td><td>Saves your settings, listed above.</td></tr>
+              <tr><td>Runs on <code>https://x.com/*</code></td><td>Reads post counts already on the page and shows the badges. It runs on no other site.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Sharing and selling data</h2>
+        <p>
+          Bot Meter doesn't collect user data, so there is nothing to share or sell. No data is transferred
+          to third parties, used for advertising, or used to determine creditworthiness.
+        </p>
+
+        <h2>Children</h2>
+        <p>Bot Meter does not knowingly collect information from anyone, including children under 13.</p>
+
+        <h2>Changes to this policy</h2>
+        <p>
+          If a future version ever changes how data is handled, this page will be updated first, with a new
+          effective date, and the change will be described in the extension's release notes.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          Questions about this policy: message <a href="https://x.com/buildwithSud">@buildwithSud</a> on X,
+          or open an issue on <a href="https://github.com/sudarshan161219/Bot-Meter-for-X/issues">GitHub</a>.
+        </p>
+      </main>
+
+      <footer class="foot">
+        <span>Bot Meter is not affiliated with or endorsed by X Corp.</span>
+        <nav aria-label="Footer">
+          <a href="./">Home</a>
+          <a href="https://github.com/sudarshan161219/Bot-Meter-for-X">Source on GitHub</a>
+          <a href="https://buymeacoffee.com/sudarshanhosalli">Buy me a coffee</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>

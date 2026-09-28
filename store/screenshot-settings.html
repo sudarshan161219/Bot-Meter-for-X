@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Store screenshot: settings</title>
+    <!-- Chrome Web Store screenshot (1280x800) showing the real popup.
+         Needs http:// (not file://) so it can fill the popup iframe. Regenerate: npm run store:images -->
+    <link rel="stylesheet" href="../src/content.css" />
+    <link rel="stylesheet" href="store.css" />
+    <script src="../src/settings.js"></script>
+  </head>
+  <body>
+    <div class="shot">
+      <section class="pitch">
+        <img src="../icons/icon128.png" width="72" height="72" alt="" />
+        <h1>Tune it to your feed</h1>
+        <p>Set your own thresholds, then label, dim or collapse posts from likely bots.</p>
+        <ul>
+          <li>✓ No login, no API key</li>
+          <li>✓ No extra requests: reads data X already loads</li>
+          <li>✓ Nothing collected or sent anywhere</li>
+          <li>✓ Free and open source</li>
+        </ul>
+      </section>
+      <div class="popup-frame">
+        <iframe id="popup" src="../src/popup.html" title="Bot Meter settings"></iframe>
+      </div>
+    </div>
+    <script>
+      // The popup reads chrome.storage, which only exists inside the extension:
+      // fill its fields with the defaults for the picture.
+      document.getElementById('popup').addEventListener('load', (e) => {
+        const form = e.target.contentDocument.getElementById('form');
+        for (const [key, value] of Object.entries(BOT_METER_DEFAULTS)) {
+          const field = form.elements[key];
+          if (!field) continue;
+          if (field.type === 'checkbox') field.checked = value;
+          else field.value = value;
+        }
+      });
+    </script>
+  </body>
+</html>
