@@ -65,7 +65,7 @@
       const idFor = (daysAgo) => String((BigInt(now - daysAgo * 864e5) - 1288834974657n) << 22n);
       const users = [
         { screenName: 'maya_writes', restId: idFor(3100), statuses: 6500, followers: 2140, following: 530 },
-        { screenName: 'cryptoalpha_x9', restId: idFor(240), statuses: 98900, followers: 180, following: 4990 },
+        { screenName: 'cryptoalpha_x9', restId: idFor(240), statuses: 98900, followers: 180, following: 4990, verified: true },
         { screenName: 'newsdesk_daily', restId: idFor(2200), statuses: 158000, followers: 61200, following: 310 },
         { screenName: 'sam_bakes', restId: idFor(1500), statuses: 2300, followers: 412, following: 388 },
       ];
@@ -73,7 +73,8 @@
       // Show what hovering a badge reveals.
       setTimeout(() => {
         const s = BotMeterStats;
-        const u = users[1];
+        // As if the viewer had opened this account's "About this account" panel.
+        const u = { ...users[1], aboutKnown: true, handleChanges: 3, lastHandleChangeMs: now - 40 * 864e5 };
         const st = s.computeStats(u, BOT_METER_DEFAULTS);
         document.getElementById('tip').textContent = s.describe(u, st);
         const badge = document.querySelector('a[href="/cryptoalpha_x9"] + .bm-badge');

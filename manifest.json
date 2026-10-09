@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bot Meter for X: Twitter Bot Detector",
-  "version": "1.2.0",
+  "version": "1.7.0",
   "description": "Twitter bot detector for X: see how many posts per day every account makes, right in your feed. Spot, dim or hide spam bots.",
   "permissions": [
     "storage"

@@ -22,7 +22,7 @@
 
       <main class="doc">
         <h1>Privacy policy</h1>
-        <p class="updated">Effective September 28, 2026</p>
+        <p class="updated">Effective October 9, 2026</p>
 
         <div class="summary-box">
           <p>
@@ -47,10 +47,21 @@
           <li>each account's total post count</li>
           <li>each account's numeric ID, used to work out when the account was created</li>
           <li>follower and following counts, shown in the badge's hover details</li>
+          <li>X's own "sensitive content" flags on posts, media and accounts</li>
+          <li>which posts X marks as ads, and the headings of X's sidebar boxes ("Who to follow", trends, Premium, Live)</li>
+          <li>
+            when you open an account's "About this account" panel on X: the country, handle-change count and
+            sign-up source X shows there, kept in memory for that visit only
+          </li>
+          <li>
+            if "Also match adult words" is on: the text of posts and authors' display names on the page,
+            checked against a short built-in list of words (such as "NSFW" and "OnlyFans")
+          </li>
         </ul>
         <p>
-          It uses these only to calculate posts per day and draw a badge next to each account. All of this
-          happens inside your browser. The extension does not read your direct messages, your password,
+          It uses these only to calculate posts per day, draw a badge next to each account, and label, blur
+          or hide posts that look like adult content. All of this happens inside your browser; post text is
+          checked in place and never saved or sent anywhere. The extension does not read your direct messages, your password,
           your X login session, or any page outside x.com.
         </p>
 
@@ -67,6 +78,9 @@
           <li>your "high rate" and "likely bot" posts-per-day thresholds</li>
           <li>whether to show a badge on every account</li>
           <li>what to do with posts from likely bots (label, dim or collapse)</li>
+          <li>which kinds of posts to check (replies, reposts, quoted posts)</li>
+          <li>what to do with adult content (off, label, blur or hide), and whether to match adult words</li>
+          <li>which of these to hide: promoted posts, "Who to follow", "What's happening", "Subscribe to Premium", "Live on X"</li>
         </ul>
         <p>
           If you're signed in to Chrome with sync turned on, Chrome syncs these settings across your
@@ -82,7 +96,7 @@
             </thead>
             <tbody>
               <tr><td><code>storage</code></td><td>Saves your settings, listed above.</td></tr>
-              <tr><td>Runs on <code>https://x.com/*</code></td><td>Reads post counts already on the page and shows the badges. It runs on no other site.</td></tr>
+              <tr><td>Runs on <code>https://x.com/*</code></td><td>Reads post counts, sensitive-content flags and (optionally) post text already on the page, to show badges and filter adult content. It runs on no other site.</td></tr>
             </tbody>
           </table>
         </div>

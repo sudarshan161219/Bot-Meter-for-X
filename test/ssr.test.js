@@ -21,6 +21,8 @@ async function replay(page) {
     requestAnimationFrame() {},
     performance: { now: () => 0 },
     setTimeout,
+    setInterval: () => 0,
+    clearInterval: () => {},
     Event: class {},
     ReadableStream,
     TextEncoder,

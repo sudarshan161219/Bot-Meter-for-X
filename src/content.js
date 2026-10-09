@@ -3,16 +3,50 @@
 (() => {
   const SOURCE = 'bot-meter-x';
   const DEFAULTS = globalThis.BOT_METER_DEFAULTS;
-  const { computeStats, formatBadge, formatPhrase, formatAge, describe } = globalThis.BotMeterStats;
+  const { computeStats, formatBadge, formatPhrase, formatAge, describe, hasAdultWords } = globalThis.BotMeterStats;
   const HANDLE_RE = /^[A-Za-z0-9_]{1,15}$/;
   const PROFILE_TABS = new Set(['with_replies', 'media', 'reposts', 'highlights', 'articles', 'likes', 'superfollows', 'affiliates']);
 
   const users = new Map(); // lowercased handle -> user record from inject.js
-  const revealed = new Set(); // handles the viewer chose to show despite "collapse"
+  const aboutInfo = new Map(); // lowercased handle -> "About this account" facts (only for panels the viewer opened)
+  const revealed = new Set(); // "bot:<handle>" / "adult:<handle>" the viewer chose to show anyway
   // Post kinds, keyed by the post ID that appears in the page's /status/<id> links.
   const replies = new Set(); // IDs of replies
   const reposts = new Set(); // IDs of posts that showed up as someone's repost
   const quotedAuthorOf = new Map(); // quoting post ID -> lowercased author of the quoted post
+  const sensitivePosts = new Set(); // IDs of posts X flags as sensitive
+  const promotedPosts = new Set(); // IDs of ads (timeline entries with promoted_metadata)
+  // Boxes the "Hide" switches remove. Headings start with English defaults and
+  // grow with the headings X actually sends (in the reader's language).
+  const BOXES = {
+    people: {
+      setting: 'hideWhoToFollow',
+      headers: new Set(['who to follow', 'you might like', 'creators for you']),
+      paths: new Set(['/i/connect_people']),
+      // On X's own suggestions page, the suggestions are the content.
+      homePage: (path) => path.startsWith('/i/connect_people') || path.endsWith('/who_to_follow'),
+    },
+    trends: {
+      setting: 'hideTrends',
+      headers: new Set(["what's happening", 'trends for you', 'trending now', "what's trending"]),
+      paths: new Set(['/explore/tabs/for-you', '/explore/tabs/trending']),
+      homePage: (path) => path.startsWith('/explore') || path.startsWith('/search'),
+    },
+    premium: {
+      setting: 'hidePremium',
+      headers: new Set(['subscribe to premium']),
+      paths: new Set(['/i/premium_sign_up']),
+      homePage: (path) => path.startsWith('/i/premium') || path.startsWith('/i/verified'),
+    },
+    live: {
+      setting: 'hideLive',
+      headers: new Set(['live on x']),
+      paths: new Set(),
+      homePage: (path) => path.startsWith('/i/broadcasts') || path.startsWith('/i/spaces'),
+    },
+  };
+  const HEADINGS = 'h1, h2, h3, h4, [role="heading"]';
+  const norm = (text) => text.trim().toLowerCase().replace(/[‘’]/g, "'");
   let settings = { ...DEFAULTS };
   let scanTimer = null;
 
@@ -43,7 +77,13 @@
       // Profiles carry the exact join date, posts don't: keep whatever we already know.
       const merged = { ...prev };
       for (const [k, v] of Object.entries(u)) if (v != null) merged[k] = v;
-      if (!prev || prev.statuses !== merged.statuses || prev.createdAt !== merged.createdAt || prev.followers !== merged.followers) {
+      if (
+        !prev ||
+        prev.statuses !== merged.statuses ||
+        prev.createdAt !== merged.createdAt ||
+        prev.followers !== merged.followers ||
+        prev.sensitive !== merged.sensitive
+      ) {
         changed = true;
       }
       users.set(key, merged);
@@ -58,13 +98,59 @@
         reposts.add(p.repostOf);
         changed = true;
       }
+      if (p.sensitive === true && !sensitivePosts.has(p.id)) {
+        sensitivePosts.add(p.id);
+        changed = true;
+      }
       if (typeof p.quotedAuthor === 'string' && !quotedAuthorOf.has(p.id)) {
         quotedAuthorOf.set(p.id, p.quotedAuthor.toLowerCase());
         changed = true;
       }
     }
+    for (const a of Array.isArray(data.about) ? data.about : []) {
+      if (!a || typeof a.screenName !== 'string' || !HANDLE_RE.test(a.screenName)) continue;
+      const key = a.screenName.toLowerCase();
+      const facts = {
+        basedIn: typeof a.basedIn === 'string' ? a.basedIn : null,
+        connectedVia: typeof a.connectedVia === 'string' ? a.connectedVia : null,
+        handleChanges: Number.isInteger(a.handleChanges) ? a.handleChanges : null,
+        lastHandleChangeMs: Number.isInteger(a.lastHandleChangeMs) ? a.lastHandleChangeMs : null,
+      };
+      if (JSON.stringify(aboutInfo.get(key)) !== JSON.stringify(facts)) {
+        aboutInfo.set(key, facts);
+        changed = true;
+      }
+    }
+    for (const id of Array.isArray(data.promoted) ? data.promoted : []) {
+      if (typeof id === 'string' && !promotedPosts.has(id)) {
+        promotedPosts.add(id);
+        changed = true;
+      }
+    }
+    for (const m of Array.isArray(data.modules) ? data.modules : []) {
+      const box = BOXES[m?.kind];
+      if (!box) continue;
+      const header = typeof m.header === 'string' ? norm(m.header) : '';
+      if (header && !box.headers.has(header)) {
+        box.headers.add(header);
+        changed = true;
+      }
+      const path = typeof m.url === 'string' ? pathOf(m.url) : null;
+      if (path && !box.paths.has(path)) {
+        box.paths.add(path);
+        changed = true;
+      }
+    }
     if (changed) scheduleScan();
   });
+
+  function pathOf(url) {
+    try {
+      return new URL(url, location.origin).pathname.toLowerCase();
+    } catch {
+      return null;
+    }
+  }
 
   // --- scanning ---
 
@@ -80,6 +166,7 @@
     const focalId = location.pathname.match(/\/status\/(\d+)/)?.[1];
     const decorated = new Set();
     const handled = new Set();
+    const hidden = new Set(); // elements removed from view (ads, suggestion boxes)
 
     for (const article of document.querySelectorAll('article')) {
       // Author links that belong to this post (not to a nested quoted post).
@@ -91,16 +178,26 @@
       }
       const author = links[0]?.handle ?? null;
       const id = postId(article, author);
+      if (isHiddenAd(article, id)) {
+        hidden.add(article.closest('[data-timeline-entry]') ?? article);
+        for (const { link } of links) handled.add(link);
+        syncArticle(article, author, null, null);
+        continue;
+      }
       const checked = isChecked(postKind(article, id, focalId));
       const quotedAuthor = id ? quotedAuthorOf.get(id) : undefined;
+      // Adult checks run on every post, whatever the bot-check toggles say.
+      const adult = adultReason(article, author, id, links[0]?.link);
       links.forEach(({ link, handle }, i) => {
         handled.add(link);
         // Later author links in a post are usually the quoted post's author.
-        const on = i > 0 && handle.toLowerCase() === quotedAuthor ? settings.onQuotes : checked;
-        decorated.add(decorateHandleLink(link, on ? handle : null));
+        const isQuoted = i > 0 && handle.toLowerCase() === quotedAuthor;
+        const on = isQuoted ? settings.onQuotes : checked;
+        const label = i === 0 && settings.adultAction === 'label' ? adult : null;
+        decorated.add(decorateHandleLink(link, on ? handle : null, label));
       });
       // Only the post's own author decides dimming/collapsing.
-      syncArticle(article, author, checked ? lookup(author) : null);
+      syncArticle(article, author, checked ? lookup(author) : null, adult);
     }
 
     // Author links outside posts: user lists, hover cards, "who to follow".
@@ -115,7 +212,101 @@
       if (!decorated.has(badge)) badge.remove();
     }
 
+    if (settings.enabled) {
+      for (const box of Object.values(BOXES)) {
+        if (settings[box.setting]) for (const el of findBoxes(box)) hidden.add(el);
+      }
+    }
+    for (const el of document.querySelectorAll('.bm-hidden')) {
+      if (!hidden.has(el)) el.classList.remove('bm-hidden');
+    }
+    for (const el of hidden) {
+      if (!el.classList.contains('bm-hidden')) el.classList.add('bm-hidden');
+    }
+
     decorateProfile();
+  }
+
+  // Ads: X's promoted_metadata, or (fallback, English UI) an "Ad"/"Promoted" label in the post.
+  function isHiddenAd(article, id) {
+    if (!settings.enabled || !settings.hidePromoted || article.parentElement?.closest('article')) return false;
+    if (id && promotedPosts.has(id)) return true;
+    for (const el of article.querySelectorAll('span, div')) {
+      if (el.childElementCount !== 0 || el.closest('article') !== article || el.closest('[dir="auto"], a')) continue;
+      const text = el.textContent.trim();
+      if (text === 'Ad' || text === 'Promoted') return true;
+    }
+    return false;
+  }
+
+  // Elements to hide for one kind of box ("Who to follow", "What's happening"),
+  // in the feed and the sidebar.
+  function findBoxes(box) {
+    const found = new Set();
+    const path = location.pathname.toLowerCase();
+    if (box.homePage(path)) return found;
+    const add = (el) => {
+      if (!el) return;
+      found.add(el);
+      // Outside the feed, also drop empty divider/frame elements right next to it.
+      if (!el.closest('main, [role="main"]')) {
+        for (const sib of [el.previousElementSibling, el.nextElementSibling]) if (sib && isBlank(sib)) found.add(sib);
+      }
+    };
+    const opensWithHeader = (text) => {
+      for (const h of box.headers) if (text.startsWith(h)) return true;
+      return false;
+    };
+    // Feed: a timeline entry with no posts that opens with the box's heading.
+    for (const entry of document.querySelectorAll('[data-timeline-entry]')) {
+      if (!entry.querySelector('article') && opensWithHeader(norm(entry.textContent))) add(wrapper(entry));
+    }
+    // The card around a heading X sent for this kind of box…
+    for (const h of document.querySelectorAll(HEADINGS)) {
+      if (box.headers.has(norm(h.textContent))) add(cardAround(h));
+    }
+    // …or around its "Show more" link.
+    for (const a of document.querySelectorAll('a[href]')) {
+      // The left menu's own links (e.g. "Premium") aren't boxes.
+      if (a.closest('nav, header, [role="navigation"]')) continue;
+      const p = a.getAttribute('href').split(/[?#]/)[0].toLowerCase();
+      if (box.paths.has(p) || (box === BOXES.people && p.endsWith('/who_to_follow'))) add(cardAround(a));
+    }
+    return found;
+  }
+
+  // The whole card around `start`: climb while the container still holds just
+  // this one card (at most one heading, no posts, no search box), so the card's
+  // own frame and border go too.
+  function cardAround(start) {
+    if (start.closest('article')) return null;
+    const entry = start.closest('[data-timeline-entry]');
+    if (entry) return entry.querySelector('article') ? null : wrapper(entry);
+    let el = start;
+    while (el.parentElement) {
+      const p = el.parentElement;
+      if (p === document.body || p.matches('main, [role="main"], nav, header')) break;
+      if (p.querySelector('article, input, [role="search"]')) break;
+      if (p.querySelectorAll(HEADINGS).length > 1) break;
+      el = p;
+    }
+    return el === start ? null : wrapper(el);
+  }
+
+  // Grow `el` over parents that hold nothing else (empty wrappers, border frames).
+  function wrapper(el) {
+    for (let i = 0; i < 6 && el.parentElement; i++) {
+      const p = el.parentElement;
+      if (p === document.body || p.matches('main, [role="main"]') || p.querySelector('article, input')) break;
+      if (![...p.children].every((c) => c === el || isBlank(c))) break;
+      el = p;
+    }
+    return el;
+  }
+
+  // No text and no media: a spacer, divider line or empty frame.
+  function isBlank(el) {
+    return !el.textContent.trim() && !el.querySelector('img, video, svg, canvas, iframe, input, button');
   }
 
   // The post's own ID, from its permalink (/<author>/status/<id>).
@@ -139,6 +330,30 @@
     return null;
   }
 
+  // Why a post counts as adult content, or null. X's own flags first, then words.
+  function adultReason(article, author, id, authorLink) {
+    if (!settings.enabled || settings.adultAction === 'off') return null;
+    if (id && sensitivePosts.has(id)) return 'X marks this post as sensitive';
+    if (author && users.get(author.toLowerCase())?.sensitive === true) return 'X marks this account as sensitive';
+    if (!settings.adultWords) return null;
+    let text = displayName(article, author, authorLink);
+    for (const el of article.querySelectorAll('[dir="auto"]')) {
+      if (el.closest('article') === article) text += `\n${el.textContent}`;
+    }
+    return hasAdultWords(text) ? 'Matches adult words (NSFW, 18+, OnlyFans…)' : null;
+  }
+
+  // The author's display name: the link to their profile that isn't the @handle.
+  function displayName(article, author, authorLink) {
+    if (!author) return '';
+    const href = `/${author.toLowerCase()}`;
+    for (const a of article.querySelectorAll('a[href^="/"]')) {
+      if (a === authorLink || a.closest('article') !== article) continue;
+      if (a.getAttribute('href').toLowerCase() === href && !a.textContent.trim().startsWith('@')) return a.textContent;
+    }
+    return '';
+  }
+
   function isChecked(kind) {
     if (kind === 'reply') return settings.onReplies;
     if (kind === 'repost') return settings.onReposts;
@@ -148,8 +363,11 @@
 
   function lookup(handle) {
     if (!settings.enabled || !handle) return null;
-    const user = users.get(handle.toLowerCase());
-    if (!user) return null;
+    const key = handle.toLowerCase();
+    const base = users.get(key);
+    if (!base) return null;
+    const about = aboutInfo.get(key);
+    const user = about ? { ...base, ...about, aboutKnown: true } : base;
     const stats = computeStats(user, settings);
     return stats ? { user, stats } : null;
   }
@@ -190,21 +408,26 @@
   }
 
   // Returns the badge element (or null) so scan() can remove stale ones.
-  function decorateHandleLink(link, handle) {
+  // `adultLabel` (a reason) adds an "18+" marker, shown even without post stats.
+  function decorateHandleLink(link, handle, adultLabel = null) {
     const found = lookup(handle);
     const show = found && (settings.showAll || found.stats.level !== 'ok');
     const anchor = badgeAnchor(link);
     const next = anchor.nextElementSibling;
     const existing = next?.classList.contains('bm-badge') ? next : null;
-    return syncBadge(
-      existing,
-      (badge) => anchor.after(badge),
-      show && {
-        className: `bm-badge bm-${found.stats.level}`,
-        text: formatBadge(found.stats.rate),
-        title: describe(found.user, found.stats),
-      }
-    );
+    let spec = show && {
+      className: `bm-badge bm-${found.stats.level}`,
+      text: formatBadge(found.stats.rate),
+      title: describe(found.user, found.stats),
+    };
+    if (adultLabel) {
+      spec = {
+        className: 'bm-badge bm-adult',
+        text: spec ? `18+ · ${spec.text}` : '18+',
+        title: `Possible adult content: ${adultLabel}` + (spec ? `\n\n${spec.title}` : ''),
+      };
+    }
+    return syncBadge(existing, (badge) => anchor.after(badge), spec);
   }
 
   // Profile header: the "@handle" under the display name (plain text, not a link).
@@ -257,17 +480,33 @@
     return badge;
   }
 
-  function syncArticle(article, handle, found) {
-    const flagged = found?.stats.level === 'bot';
-    const action = flagged ? settings.botAction : 'label';
-    const collapse = action === 'collapse' && !revealed.has(handle?.toLowerCase());
+  function syncArticle(article, handle, found, adult) {
+    const who = handle?.toLowerCase() ?? '';
+    let mode = null; // 'collapse' | 'blur'
+    let reason = null;
+    let text = '';
+    let title = '';
+    if (adult && (settings.adultAction === 'hide' || settings.adultAction === 'blur') && !revealed.has(`adult:${who}`)) {
+      mode = settings.adultAction === 'blur' ? 'blur' : 'collapse';
+      reason = 'adult';
+      text = `${mode === 'blur' ? 'Blurred' : 'Hidden'}: possible adult content${handle ? ` from @${handle}` : ''}.`;
+      title = adult;
+    }
+    const botAction = found?.stats.level === 'bot' ? settings.botAction : 'label';
+    if (!mode && botAction === 'collapse' && !revealed.has(`bot:${who}`)) {
+      mode = 'collapse';
+      reason = 'bot';
+      text = `Hidden post from @${found.user.screenName}, who averages about ${formatPhrase(found.stats.rate)}: likely a bot.`;
+      title = describe(found.user, found.stats);
+    }
 
-    article.classList.toggle('bm-dim', action === 'dim');
-    article.classList.toggle('bm-collapsed', collapse);
+    article.classList.toggle('bm-dim', botAction === 'dim' && mode !== 'collapse');
+    article.classList.toggle('bm-collapsed', mode === 'collapse');
+    article.classList.toggle('bm-blur', mode === 'blur');
 
     const prev = article.previousElementSibling;
     let notice = prev?.classList.contains('bm-notice') ? prev : null;
-    if (!collapse) {
+    if (!mode) {
       notice?.remove();
       return;
     }
@@ -281,17 +520,16 @@
       button.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        revealed.add(notice.dataset.handle);
+        revealed.add(notice.dataset.key);
         scheduleScan();
       });
       notice.append(button);
       article.parentElement.insertBefore(notice, article);
     }
-    const text = `Hidden post from @${found.user.screenName}, who averages about ${formatPhrase(found.stats.rate)}: likely a bot.`;
     const label = notice.firstElementChild;
     if (label.textContent !== text) label.textContent = text;
-    if (notice.title !== describe(found.user, found.stats)) notice.title = describe(found.user, found.stats);
-    notice.dataset.handle = handle.toLowerCase();
+    if (notice.title !== title) notice.title = title;
+    notice.dataset.key = `${reason}:${who}`;
   }
 
   new MutationObserver(scheduleScan).observe(document.documentElement, {

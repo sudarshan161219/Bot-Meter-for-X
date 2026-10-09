@@ -17,8 +17,8 @@
         <input type="checkbox" name="enabled" />
       </label>
 
-      <label class="row">
-        <span>Badge on every account<small>Off: only flag high-rate accounts</small></span>
+      <label class="row" title="Off: only flag high-rate accounts">
+        <span>Badge on every account</span>
         <input type="checkbox" name="showAll" />
       </label>
 
@@ -41,27 +41,45 @@
         </select>
       </label>
 
+      <label class="row" title="Uses X's own sensitive-content flags on posts, media and accounts">
+        <span>Adult (18+) content</span>
+        <select name="adultAction">
+          <option value="off">Off</option>
+          <option value="label">Label</option>
+          <option value="blur">Blur</option>
+          <option value="hide">Hide</option>
+        </select>
+      </label>
+
+      <label class="row" title="NSFW, 18+, OnlyFans, 🔞 in posts and display names">
+        <span>Also match adult words</span>
+        <input type="checkbox" name="adultWords" />
+      </label>
+
       <fieldset>
-        <legend>Check these posts<small>Off: no badge, never dimmed or collapsed</small></legend>
-        <label class="row">
-          <span>Replies</span>
-          <input type="checkbox" name="onReplies" />
-        </label>
-        <label class="row">
-          <span>Reposts</span>
-          <input type="checkbox" name="onReposts" />
-        </label>
-        <label class="row">
-          <span>Quoted posts</span>
-          <input type="checkbox" name="onQuotes" />
-        </label>
+        <legend title="Off: no badge, never dimmed or collapsed as a bot">Check these posts for bots</legend>
+        <div class="chips">
+          <label><input type="checkbox" name="onReplies" /> Replies</label>
+          <label><input type="checkbox" name="onReposts" /> Reposts</label>
+          <label><input type="checkbox" name="onQuotes" /> Quoted posts</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="chips">
+          <b>Hide:</b>
+          <label title="Promoted posts"><input type="checkbox" name="hidePromoted" /> Ads</label>
+          <label><input type="checkbox" name="hideWhoToFollow" /> Who to follow</label>
+          <label title="The &quot;What's happening&quot; / trends box"><input type="checkbox" name="hideTrends" /> Trends</label>
+          <label title="The &quot;Subscribe to Premium&quot; box"><input type="checkbox" name="hidePremium" /> Premium</label>
+          <label title="The &quot;Live on X&quot; box"><input type="checkbox" name="hideLive" /> Live</label>
+        </div>
       </fieldset>
     </form>
 
     <p class="note">
-      The badge is an average: total posts ÷ days since joining. <b>3/day</b> means about
-      3 posts a day; quiet accounts show <b>2/week</b> or <b>3/month</b>. Replies and reposts
-      count as posts, so treat it as a hint, not proof.
+      <b>3/day</b> = average posts a day since joining. Replies and reposts count, so it's a
+      hint, not proof.
     </p>
 
     <footer>

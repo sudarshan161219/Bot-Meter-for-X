@@ -100,6 +100,24 @@
 
   const num = (n) => (n == null ? '?' : n.toLocaleString('en-US'));
 
+  const shortDate = (ms) => new Date(ms).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+
+  // One scannable line: "Premium · 35/day · 2 handle changes (last Mar 2025)".
+  function accountFacts(user, stats) {
+    const facts = [];
+    if (user.verifiedType === 'Business') facts.push('Verified organization');
+    else if (user.verifiedType === 'Government') facts.push('Government account');
+    else if (user.verified) facts.push('Premium');
+    facts.push(formatBadge(stats.rate));
+    if (Number.isInteger(user.handleChanges)) {
+      const n = user.handleChanges;
+      let text = n === 0 ? 'never changed handle' : `${n} handle change${n === 1 ? '' : 's'}`;
+      if (n > 0 && Number.isInteger(user.lastHandleChangeMs)) text += ` (last ${shortDate(user.lastHandleChangeMs)})`;
+      facts.push(text);
+    }
+    return facts.join(' · ');
+  }
+
   function describe(user, stats) {
     const joined = new Date(stats.created).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -108,17 +126,26 @@
     });
     const lines = [
       `@${user.screenName} averages about ${formatPhrase(stats.rate)}`,
+      accountFacts(user, stats),
       `${num(user.statuses)} posts in ${formatAge(stats.ageDays)} (joined ${stats.approx ? '≈ ' : ''}${joined})`,
     ];
     if (user.followers != null || user.following != null) {
       lines.push(`${num(user.followers)} followers · ${num(user.following)} following`);
     }
     if (user.media != null) lines.push(`${num(user.media)} media posts`);
+    if (user.sensitive === true) lines.push('X marks this account as sensitive (18+)');
     if (stats.level === 'bot') lines.push('Very high posting rate: likely automated');
     else if (stats.level === 'warn') lines.push('High posting rate');
+    if (user.basedIn) lines.push(`Based in ${user.basedIn}${user.connectedVia ? ` · connected via ${user.connectedVia}` : ''}`);
+    if (!user.aboutKnown) lines.push('Open "About this account" on their profile to add handle changes and country.');
     lines.push('Average = total posts ÷ days since joining. Counts replies and reposts.');
     return lines.join('\n');
   }
 
-  globalThis.BotMeterStats = { computeStats, joinDateFromId, formatBadge, formatPhrase, formatAge, describe };
+  // Words common in adult spam, matched as whole words in post text and display names.
+  // Kept short and specific: broad words ("sex", "nude") hide too many ordinary posts.
+  const ADULT_WORDS = /(?:^|[^\p{L}\p{N}_])(?:nsfw|onlyfans|fansly|porn|porno|pornhub|nudes|hentai|18\s?\+)(?![\p{L}\p{N}_])|🔞/iu;
+  const hasAdultWords = (text) => ADULT_WORDS.test(text);
+
+  globalThis.BotMeterStats = { computeStats, joinDateFromId, formatBadge, formatPhrase, formatAge, describe, hasAdultWords };
 })();

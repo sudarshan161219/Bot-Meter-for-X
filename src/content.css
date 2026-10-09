@@ -36,6 +36,11 @@
   padding: 2px 10px;
 }
 
+.bm-badge.bm-adult {
+  color: #fff;
+  background: #7c3aed;
+}
+
 article.bm-dim {
   opacity: 0.35;
   transition: opacity 0.15s;
@@ -43,6 +48,20 @@ article.bm-dim {
 
 article.bm-dim:hover {
   opacity: 1;
+}
+
+article.bm-blur {
+  overflow: hidden;
+}
+
+article.bm-blur > * {
+  filter: blur(18px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.bm-hidden {
+  display: none !important;
 }
 
 article.bm-collapsed {

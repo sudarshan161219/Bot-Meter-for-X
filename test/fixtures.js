@@ -103,6 +103,52 @@ const xwebTimeline = {
               ),
               // A reply to post 20.
               entry(xwebTweet('24', xwebAuthor('replier', '1600000000000000000', 1200), { reply_to_results: { rest_id: '20' } })),
+              // Sensitive: post 27 is flagged by X (and its author's account too);
+              // post 28 only has media carrying X's adult-content warning.
+              entry(
+                xwebTweet('27', { ...xwebAuthor('spicy_account', '1750000000000000000', 5000), possibly_sensitive: true }, {}, {
+                  possibly_sensitive: true,
+                })
+              ),
+              entry(
+                xwebTweet('28', xwebAuthor('media_poster', '1760000000000000000', 300), {
+                  media_entities2: [{ type: 'photo', sensitive_media_warning: { adult_content: true } }],
+                })
+              ),
+              // An ad: the timeline item carries promoted_metadata next to post 29.
+              {
+                entryId: 'promoted-tweet-29',
+                content: {
+                  itemContent: {
+                    __typename: 'TimelineTweet',
+                    tweet_results: { result: xwebTweet('29', xwebAuthor('advertiser', '1100000000000000000', 70)) },
+                    promoted_metadata: { disclosure_type: 'NoDisclosure', impression_id: 'abc' },
+                  },
+                },
+              },
+              // A "Who to follow" module: user items, a header and a "Show more" footer.
+              {
+                entryId: 'who-to-follow-1',
+                content: {
+                  __typename: 'TimelineTimelineModule',
+                  header: { text: 'Who to follow' },
+                  footer: { landing_url: { url: '/i/connect_people?user_id=1', url_type: 'Url' } },
+                  items: [
+                    { entry_id: 'u1', item: { content: { __typename: 'TimelineUser', user_results: { result: xwebAuthor('suggested_one', '1200000000000000000', 10) } } } },
+                    { entry_id: 'u2', item: { content: { __typename: 'TimelineUser', user_results: { result: xwebAuthor('suggested_two', '1210000000000000000', 20) } } } },
+                  ],
+                },
+              },
+              // A "What's happening" module: trend items.
+              {
+                entryId: 'trends-1',
+                content: {
+                  __typename: 'TimelineTimelineModule',
+                  header: { text: 'What’s happening' },
+                  footer: { landing_url: { url: 'https://x.com/explore/tabs/for-you', url_type: 'Url' } },
+                  items: [{ entry_id: 't1', item: { content: { __typename: 'TimelineTrend', name: '#Starliner' } } }],
+                },
+              },
               // Post 25 quotes post 26 by @quoted_person (wrapped with visibility results).
               entry(
                 xwebTweet('25', xwebAuthor('quoter', '1700000000000000000', 400), {
@@ -153,6 +199,24 @@ const initialState = {
   },
 };
 
-const all = { homeTimeline, xwebTimeline, legacyUserByScreenName, initialState };
+// x-web AboutAccountQuery (the profile's "About this account" panel).
+const aboutAccount = {
+  data: {
+    user_result_by_screen_name: {
+      result: {
+        __typename: 'User',
+        core: { screen_name: 'fresh_bot', name: 'FRESH_BOT', created_at_ms: 1736900000000 },
+        about_profile: {
+          account_based_in: 'India',
+          source: 'India Android App',
+          username_changes: { count: '2', last_changed_at_msec: '1740787200000' },
+        },
+        verification: { is_blue_verified: true },
+      },
+    },
+  },
+};
+
+const all = { homeTimeline, xwebTimeline, legacyUserByScreenName, initialState, aboutAccount };
 if (typeof module !== 'undefined') module.exports = all;
 else globalThis.BotMeterFixtures = all;

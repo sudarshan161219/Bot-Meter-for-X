@@ -12,4 +12,14 @@ globalThis.BOT_METER_DEFAULTS = {
   onReplies: true,
   onReposts: true,
   onQuotes: true,
+  // Posts X flags as sensitive (or from accounts it flags): 'off' | 'label' | 'blur' | 'hide'.
+  adultAction: 'hide',
+  // Also treat posts as adult when their text or author name has words like NSFW, 18+, OnlyFans.
+  adultWords: true,
+  // Declutter: remove these from the page entirely.
+  hidePromoted: true,
+  hideWhoToFollow: true,
+  hideTrends: true,
+  hidePremium: true,
+  hideLive: true,
 };

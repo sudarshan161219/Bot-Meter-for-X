@@ -5,7 +5,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { homeTimeline, xwebTimeline, legacyUserByScreenName, initialState } = require('./fixtures');
+const { homeTimeline, xwebTimeline, legacyUserByScreenName, initialState, aboutAccount } = require('./fixtures');
 
 const src = (f) => fs.readFileSync(path.join(__dirname, '..', 'src', f), 'utf8');
 
@@ -40,6 +40,8 @@ function sandbox() {
   };
   const ctx = {
     window,
+    setInterval: () => 0,
+    clearInterval: () => {},
     XMLHttpRequest: FakeXHR,
     document: { addEventListener: (t, fn) => (domListeners[t] = fn) },
   };
@@ -171,12 +173,99 @@ test('reports replies, reposts and quotes', async () => {
   await window.fetch('https://api.x.com/graphql/abc123/HomeTimeline', xwebTimeline);
   await flush();
   const posts = Object.fromEntries(posted.flatMap((m) => m.posts).map((p) => [p.id, { ...p }]));
-  assert.deepStrictEqual(posts['22'], { id: '22', reply: false, repostOf: '23', quotedId: null, quotedAuthor: null });
-  assert.deepStrictEqual(posts['24'], { id: '24', reply: true, repostOf: null, quotedId: null, quotedAuthor: null });
-  assert.deepStrictEqual(posts['25'], { id: '25', reply: false, repostOf: null, quotedId: '26', quotedAuthor: 'quoted_person' });
+  const base = { reply: false, repostOf: null, quotedId: null, quotedAuthor: null, sensitive: false };
+  assert.deepStrictEqual(posts['22'], { ...base, id: '22', repostOf: '23' });
+  assert.deepStrictEqual(posts['24'], { ...base, id: '24', reply: true });
+  assert.deepStrictEqual(posts['25'], { ...base, id: '25', quotedId: '26', quotedAuthor: 'quoted_person' });
   // Plain posts aren't reported.
   assert.strictEqual(posts['20'], undefined);
   assert.strictEqual(posts['23'], undefined);
+});
+
+test("reads X's sensitive-content flags on posts, media and accounts", async () => {
+  const { window, posted } = sandbox();
+  await window.fetch('https://api.x.com/graphql/abc123/HomeTimeline', xwebTimeline);
+  await flush();
+  const posts = Object.fromEntries(posted.flatMap((m) => m.posts).map((p) => [p.id, p]));
+  const users = byName(posted);
+  assert.strictEqual(posts['27'].sensitive, true);
+  assert.strictEqual(posts['28'].sensitive, true);
+  assert.strictEqual(posts['24'].sensitive, false);
+  assert.strictEqual(users.spicy_account.sensitive, true);
+  // Accounts without the field don't get an explicit false.
+  assert.strictEqual('sensitive' in users.replier, false);
+});
+
+test('reports ads, account-suggestion and trends boxes', async () => {
+  const { window, posted } = sandbox();
+  await window.fetch('https://api.x.com/graphql/abc123/HomeTimeline', xwebTimeline);
+  await flush();
+  assert.deepStrictEqual([...posted.flatMap((m) => m.promoted)], ['29']);
+  assert.deepStrictEqual(
+    posted
+      .flatMap((m) => m.modules)
+      .map((m) => ({ ...m }))
+      .sort((a, b) => a.kind.localeCompare(b.kind)),
+    [
+      { kind: 'people', header: 'Who to follow', url: '/i/connect_people?user_id=1' },
+      { kind: 'trends', header: 'What’s happening', url: 'https://x.com/explore/tabs/for-you' },
+    ]
+  );
+});
+
+test("reports sidebar headings in the reader's language from X's i18n", () => {
+  const { window, posted, domListeners } = sandbox();
+  const spanish = { 'Live on X': 'En directo en X', 'Subscribe to Premium': 'Suscríbete a Premium' };
+  window.__TSR_ROUTER__ = { state: { matches: [{ context: {} }, { context: { i18n: { t: (k) => spanish[k] ?? k } } }] } };
+  domListeners.DOMContentLoaded();
+  const modules = posted.flatMap((m) => m.modules).map((m) => `${m.kind}: ${m.header}`);
+  assert.ok(modules.includes('live: En directo en X'), modules.join(', '));
+  assert.ok(modules.includes('premium: Suscríbete a Premium'));
+  assert.ok(modules.includes('people: Who to follow')); // untranslated keys fall back to English
+});
+
+test('reads "About this account" facts when the panel loads', async () => {
+  const { window, posted } = sandbox();
+  await window.fetch('https://api.x.com/graphql/a2bTNqyy/AboutAccountQuery', aboutAccount);
+  await flush();
+  assert.deepStrictEqual({ ...posted[0].about[0] }, {
+    screenName: 'fresh_bot',
+    basedIn: 'India',
+    connectedVia: 'India Android App',
+    handleChanges: 2,
+    lastHandleChangeMs: 1740787200000,
+  });
+});
+
+test('tooltip leads with Premium, rate and handle changes', () => {
+  const { ctx } = sandbox();
+  const { computeStats, describe } = ctx.BotMeterStats;
+  const now = Date.parse('2026-10-10T00:00:00Z');
+  const user = { screenName: 'loud', restId: '1880000000000000000', statuses: 22000, verified: true };
+  const stats = computeStats(user, { warnRate: 50, botRate: 150 }, now);
+  const before = describe(user, stats).split('\n');
+  assert.match(before[1], /^Premium · \d+\/day$/);
+  assert.ok(before.some((l) => l.startsWith('Open "About this account"')));
+
+  const known = { ...user, aboutKnown: true, handleChanges: 2, lastHandleChangeMs: 1740787200000, basedIn: 'India', connectedVia: 'India Android App' };
+  const after = describe(known, stats).split('\n');
+  assert.match(after[1], /^Premium · \d+\/day · 2 handle changes \(last Mar 2025\)$/);
+  assert.ok(after.includes('Based in India · connected via India Android App'));
+  assert.ok(!after.some((l) => l.startsWith('Open "About this account"')));
+
+  const org = describe({ ...user, verifiedType: 'Business' }, stats).split('\n');
+  assert.match(org[1], /^Verified organization · /);
+});
+
+test('matches adult-spam words, not ordinary text', () => {
+  const { ctx } = sandbox();
+  const { hasAdultWords } = ctx.BotMeterStats;
+  for (const text of ['New pics 🔞', 'link in bio NSFW', 'my OnlyFans is up', 'Fansly promo', '18+ only', 'free porn', 'Lily | 18 +']) {
+    assert.strictEqual(hasAdultWords(text), true, text);
+  }
+  for (const text of ['Happy 2018+ crew', 'anti-pornography law passed', 'nude lipstick shades', 'Turn 18 today!', 'onlyfansite', '']) {
+    assert.strictEqual(hasAdultWords(text), false, text);
+  }
 });
 
 test('derives join dates from account IDs', () => {

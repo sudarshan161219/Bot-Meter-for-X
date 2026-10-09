@@ -22,6 +22,16 @@
       [dir="auto"] a { color: #1d9bf0; }
       .social { color: #71767b; font-size: 13px; }
       .controls { flex-wrap: wrap; }
+      .module, .card { padding: 12px 16px; border-bottom: 1px solid #2f3336; display: grid; gap: 6px; }
+      .module h2, .card h2 { margin: 0; font-size: 18px; }
+      .more { color: #1d9bf0; }
+      .sidebar { display: grid; gap: 12px; padding: 12px 16px; border-top: 4px solid #2f3336; }
+      .frame { border: 1px solid #536471; border-radius: 16px; }
+      .inner { padding: 12px 16px; display: grid; gap: 6px; }
+      .inner h2 { margin: 0; font-size: 18px; }
+      .divider { height: 1px; background: #536471; }
+      .foot { color: #71767b; font-size: 13px; }
+      .leftnav { padding: 8px 16px; border-bottom: 1px solid #2f3336; }
       .col { display: flex; flex-direction: column; align-items: flex-start; }
       .ad { margin-left: auto; }
       .quote { margin-top: 10px; padding: 10px 12px; border: 1px solid #2f3336; border-radius: 16px; }
@@ -43,6 +53,8 @@
           onChanged: { addListener: (fn) => listeners.push(fn) },
         },
       };
+      // Stand-in for X's i18n: this "reader" sees "Live on X" in Spanish.
+      window.__TSR_ROUTER__ = { state: { matches: [{ context: { i18n: { t: (k) => ({ 'Live on X': 'En directo en X' })[k] ?? k } } }] } };
       // Stand-in for X's network layer; inject.js wraps this.
       window.fetch = async (url) => {
         const { homeTimeline, xwebTimeline } = BotMeterFixtures;
@@ -73,8 +85,23 @@
         <label><input type="checkbox" id="onReplies" checked /> Replies</label>
         <label><input type="checkbox" id="onReposts" checked /> Reposts</label>
         <label><input type="checkbox" id="onQuotes" checked /> Quotes</label>
+        <label>Adult:
+          <select id="adultAction">
+            <option value="off">Off</option>
+            <option value="label">Label</option>
+            <option value="blur">Blur</option>
+            <option value="hide" selected>Hide</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="adultWords" checked /> Adult words</label>
+        <label><input type="checkbox" id="hidePromoted" checked /> Hide promoted</label>
+        <label><input type="checkbox" id="hideWhoToFollow" checked /> Hide who to follow</label>
+        <label><input type="checkbox" id="hideTrends" checked /> Hide trends</label>
+        <label><input type="checkbox" id="hidePremium" checked /> Hide premium</label>
+        <label><input type="checkbox" id="hideLive" checked /> Hide live</label>
       </div>
 
+      <nav class="leftnav" aria-label="Primary"><a href="/home">Home</a> · <a href="/i/premium_sign_up">Premium</a></nav>
       <!-- Mirrors x-web (2026) markup: no data-testid; post text in dir="auto". -->
       <main>
       <div class="profile">
@@ -116,6 +143,40 @@
         </div>
       </article></div>
       <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/newsdesk">NEWSDESK</a></span> <span><a href="/newsdesk">@newsdesk</a> · <time>2m</time></span></div>
+        <div dir="auto">We're live now:</div>
+        <a class="more" href="/i/broadcasts/1abc">Watch the broadcast</a>
+      </article></div>
+      <!-- Ad: post 29's timeline entry has promoted_metadata. -->
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/advertiser">ADVERTISER</a></span> <span><a href="/advertiser">@advertiser</a> · <a href="/advertiser/status/29"><time>now</time></a></span></div>
+        <div dir="auto">Buy our thing (promoted post 29).</div>
+      </article></div>
+      <!-- Feed "Who to follow" module: no post, heading from X's data, Show more link. -->
+      <div data-timeline-entry=""><div class="module">
+        <h2>Who to follow</h2>
+        <div class="head"><span><a href="/suggested_one">Suggested One</a></span> <span><a href="/suggested_one">@suggested_one</a></span></div>
+        <div class="head"><span><a href="/suggested_two">Suggested Two</a></span> <span><a href="/suggested_two">@suggested_two</a></span></div>
+        <a class="more" href="/i/connect_people?user_id=1">Show more</a>
+      </div></div>
+      <!-- Adult: 27 is flagged by X (author too), 28 has adult media, the next one only matches words. -->
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/spicy_account">SPICY</a></span> <span><a href="/spicy_account">@spicy_account</a> · <a href="/spicy_account/status/27"><time>3m</time></a></span></div>
+        <div dir="auto">A post X flags as sensitive (27).</div>
+      </article></div>
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/media_poster">MEDIA POSTER</a></span> <span><a href="/media_poster">@media_poster</a> · <a href="/media_poster/status/28"><time>6m</time></a></span></div>
+        <div dir="auto">A post whose photo has X's adult-content warning (28).</div>
+      </article></div>
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/lily_x">Lily 🔞 link in bio</a></span> <span><a href="/lily_x">@lily_x</a> · <time>8m</time></span></div>
+        <div dir="auto">hey 😘 check my page</div>
+      </article></div>
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/news_desk">News Desk</a></span> <span><a href="/news_desk">@news_desk</a> · <time>9m</time></span></div>
+        <div dir="auto">Parliament debates the new anti-pornography bill today.</div>
+      </article></div>
+      <div data-timeline-entry=""><article>
         <!-- Ad layout: the @handle sits in a column container, not a row. -->
         <div class="head"><span><a href="/normal_human">NORMAL_HUMAN</a></span> <div class="col"><a href="/normal_human">@normal_human</a></div><span class="ad">Ad</span></div>
         <div dir="auto">An ad post, where the handle is wrapped in a column.</div>
@@ -125,10 +186,38 @@
         <div dir="auto">No data for this account, so no badge.</div>
       </article></div>
       </main>
+      <!-- Sidebar like X's: search, then cards wrapped in bordered frames, then footer links. -->
+      <aside class="sidebar">
+        <div class="search"><input type="search" placeholder="Search" /></div>
+        <div class="frame"><div class="inner">
+          <h2>Subscribe to Premium</h2>
+          <p>Subscribe to unlock new features.</p>
+          <a class="more" href="/i/premium_sign_up">Subscribe</a>
+        </div></div>
+        <div class="frame"><div class="inner">
+          <h2>En directo en X</h2>
+          <a class="more" href="/i/broadcasts/2xyz">NASA is hosting a Space</a>
+        </div></div>
+        <div class="frame"><div class="inner">
+          <h2>Who to follow</h2>
+          <div class="head"><span><a href="/suggested_one">Suggested One</a></span> <span><a href="/suggested_one">@suggested_one</a></span></div>
+          <div class="head"><span><a href="/suggested_two">Suggested Two</a></span> <span><a href="/suggested_two">@suggested_two</a></span></div>
+          <a class="more" href="/i/connect_people">Show more</a>
+        </div></div>
+        <div class="divider"></div>
+        <div class="frame"><div class="inner">
+          <h2>What’s happening</h2>
+          <div role="link">#Starliner · 12k posts</div>
+          <div role="link">#Artemis · 8k posts</div>
+          <a class="more" href="/explore/tabs/for-you">Show more</a>
+        </div></div>
+        <nav class="foot">Terms of Service · Privacy Policy · © 2026 X Corp.</nav>
+      </aside>
     </div>
     <script>
       document.getElementById('action').onchange = (e) => chrome.storage.sync.set({ botAction: e.target.value });
-      for (const id of ['showAll', 'onReplies', 'onReposts', 'onQuotes']) {
+      document.getElementById('adultAction').onchange = (e) => chrome.storage.sync.set({ adultAction: e.target.value });
+      for (const id of ['showAll', 'onReplies', 'onReposts', 'onQuotes', 'adultWords', 'hidePromoted', 'hideWhoToFollow', 'hideTrends', 'hidePremium', 'hideLive']) {
         document.getElementById(id).onchange = (e) => chrome.storage.sync.set({ [id]: e.target.checked });
       }
       // Pretend we're on the mishabot profile so the profile badge shows (reload via /test/harness.html).

@@ -31,11 +31,13 @@ FEATURES
 • Easy to read: an average in whole numbers, like 3/day, and 2/week or 3/month for quiet accounts
 • Color-coded at a glance: grey for normal, amber for a high posting rate (50+ per day), red for likely bots (150+ per day)
 • Adjustable thresholds, so you decide what counts as a bot
-• Hover a badge to see total posts, account age, join date, followers and following
+• Hover a badge for a quick summary, like "Premium · 35/day · 2 handle changes", plus total posts, account age, join date, followers and following
 • Profile badge, e.g. "About 66 posts a day · 109,671 posts in 4.5 years"
 • Deal with bot posts your way: label them, dim them, or collapse them behind a "Show" button
 • Quiet mode: only badge high-frequency accounts
 • Choose what gets checked: switch replies, reposts or quoted posts on or off
+• Adult content filter: label, blur or hide posts X flags as sensitive, plus optional matching of adult-spam words (NSFW, 18+, OnlyFans)
+• Declutter: hide promoted posts and the "Who to follow", "What's happening", "Subscribe to Premium" and "Live on X" boxes
 • Works in reply threads, where bot replies pile up the most
 
 PRIVATE AND LIGHTWEIGHT
@@ -74,7 +76,7 @@ Made by @buildwithSud. If Bot Meter saves you from a few bots, you can buy me a 
 
 **Single purpose description:**
 ```
-Bot Meter has one purpose: on x.com, it shows each account's average number of posts per day (total posts divided by account age) as a small badge next to the account's name, so users can spot likely automated (bot) accounts. An optional setting lets users dim or collapse posts from accounts above a posts-per-day threshold they choose.
+Bot Meter filters unwanted accounts and posts out of the user's X (x.com) feed. It shows each account's average number of posts per day as a small badge next to its name so users can spot likely bots, and it can dim or hide posts from likely bots, posts that X flags as sensitive (adult) content, promoted posts, and sidebar boxes such as "Who to follow", "What's happening", "Subscribe to Premium" and "Live on X". All of this happens on x.com only, using data X has already loaded into the page.
 ```
 
 **Permission justification: `storage`**
@@ -104,7 +106,7 @@ All JavaScript is packaged with the extension. Nothing is loaded from a server, 
 | Location | No | Never read |
 | Web history | No | Nothing about browsing is recorded |
 | User activity | No | No clicks, keystrokes or scrolling are tracked |
-| Website content | No | Post counts and account IDs are read on the page but processed only in the browser; nothing is stored or transmitted |
+| Website content | No | Post counts, account IDs, X's sensitive-content flags and (optionally) post text are read on the page but processed only in the browser; nothing is stored or transmitted |
 
 Then tick all three certifications:
 - I do not sell or transfer user data to third parties, outside of the approved use cases

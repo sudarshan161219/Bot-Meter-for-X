@@ -12,9 +12,19 @@ An account that has averaged 200 posts a day for years is very likely automated.
   - amber: high rate (default ≥ 50/day)
   - red: likely bot (default ≥ 150/day)
 - A larger badge on profile pages: `About 66 posts a day · 109,671 posts in 4.5 years`
-- Hover any badge for details: total posts, account age, join date, followers/following, media count.
+- Hover any badge for details. The second line sums the account up, e.g.
+  `Premium · 35/day · 2 handle changes (last Mar 2025)`, then total posts, account age, join date,
+  followers/following. Handle changes and country come from X's "About this account" panel, so
+  they appear for accounts whose panel you've opened (no extra requests are made to fetch them).
 - Posts from likely bots can be **labelled**, **dimmed** (the default), or **collapsed** behind a "Show" button.
 - Choose which posts get checked: replies, reposts and quoted posts can each be switched off.
+- Adult content filter: posts X flags as sensitive (on the post, its media, or the account) can be
+  labelled `18+`, blurred, or hidden (the default). Optionally also matches adult-spam words
+  (NSFW, 18+, OnlyFans, 🔞) in post text and display names.
+- Hide clutter: promoted posts (ads), "Who to follow", "What's happening", "Subscribe to Premium"
+  and "Live on X", in the feed and sidebar, each with its own switch. Ads are found by X's
+  `promoted_metadata`; boxes by their heading, read from X's data or X's own translations, so it
+  works in any language. The whole card goes, including its border.
 - Thresholds and behavior are configurable from the toolbar popup.
 
 ## Install

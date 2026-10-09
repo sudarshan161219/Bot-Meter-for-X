@@ -20,6 +20,10 @@
     return typeof n === 'number' && Number.isFinite(n) && n > 0 ? new Date(n).toISOString() : null;
   };
 
+  // First boolean among the candidates, or null when X didn't send the field
+  // (so merging records never turns a known "true" into "false").
+  const flag = (...vals) => vals.find((v) => typeof v === 'boolean') ?? null;
+
   function pickUser(node) {
     const core = node.core;
     const legacy = node.legacy;
@@ -38,6 +42,9 @@
         followers: node.relationship_counts?.followers ?? legacy?.followers_count ?? null,
         following: node.relationship_counts?.following ?? legacy?.friends_count ?? null,
         verified: Boolean(node.verification?.is_blue_verified ?? node.is_blue_verified),
+        verifiedType: node.verification?.verified_type ?? null,
+        // X's own "sensitive account" flag; its profile pages map it to rating=adult.
+        sensitive: flag(node.possibly_sensitive, legacy?.possibly_sensitive),
       };
     }
 
@@ -55,6 +62,7 @@
           followers: node.followers ?? null,
           following: node.following ?? null,
           verified: Boolean(node.isBlueVerified ?? node.isVerified),
+          sensitive: flag(node.possiblySensitive),
         };
       }
     }
@@ -74,6 +82,7 @@
           followers: legacy.followers_count ?? null,
           following: legacy.friends_count ?? null,
           verified: Boolean(node.is_blue_verified || legacy.verified),
+          sensitive: flag(legacy.possibly_sensitive, node.possibly_sensitive),
         };
       }
     }
@@ -90,9 +99,29 @@
         followers: node.followers_count ?? null,
         following: node.friends_count ?? null,
         verified: Boolean(node.is_blue_verified || node.verified),
+        sensitive: flag(node.possibly_sensitive),
       };
     }
     return null;
+  }
+
+  // X's "About this account" panel (AboutAccountQuery). Only loaded when the
+  // viewer opens it, so these facts exist just for accounts they've looked at.
+  function pickAbout(node) {
+    const about = node.about_profile;
+    const screenName = node.core?.screen_name;
+    if (!about || typeof about !== 'object' || typeof screenName !== 'string') return null;
+    const int = (v) => {
+      const n = Number.parseInt(v ?? '', 10);
+      return Number.isFinite(n) ? n : null;
+    };
+    return {
+      screenName,
+      basedIn: typeof about.account_based_in === 'string' ? about.account_based_in : null,
+      connectedVia: typeof about.source === 'string' ? about.source : null,
+      handleChanges: int(about.username_changes?.count),
+      lastHandleChangeMs: int(about.username_changes?.last_changed_at_msec),
+    };
   }
 
   // Tweets can arrive wrapped: { result: { __typename: 'TweetWithVisibilityResults', tweet: {...} } }.
@@ -102,8 +131,21 @@
     return t && typeof t === 'object' ? t : null;
   }
 
-  // Replies, reposts and quotes, so the content script can honor the
-  // "show badges on" toggles. Plain posts aren't reported.
+  // Media carries X's adult-content warning when the uploader or X flagged it.
+  function hasAdultMedia(node) {
+    const lists = [node.legacy?.extended_entities?.media, node.legacy?.entities?.media, node.media_entities2, node.media_entities];
+    for (const list of lists) {
+      if (!Array.isArray(list)) continue;
+      for (const m of list) {
+        const warning = m?.sensitive_media_warning ?? m?.ext_sensitive_media_warning ?? m?.ext?.sensitiveMediaWarning?.r?.ok;
+        if (warning?.adult_content === true || warning?.adultContent === true) return true;
+      }
+    }
+    return false;
+  }
+
+  // Replies, reposts, quotes and sensitive posts, so the content script can
+  // honor its toggles. Plain posts aren't reported.
   function pickPost(node) {
     if (typeof node.rest_id !== 'string' || !(node.__typename === 'Tweet' || node.core?.user_results)) return null;
     const legacy = node.legacy;
@@ -111,19 +153,55 @@
     const original = unwrapTweet(legacy?.retweeted_status_results ?? legacy?.retweeted_status_result);
     const quoted = unwrapTweet(node.quoted_tweet_results ?? node.quoted_status_result);
     const quotedAuthor = quoted?.core?.user_results?.result;
-    if (!reply && !original?.rest_id && !quoted?.rest_id) return null;
+    // X shows its own "sensitive content" warning for these posts.
+    const sensitive = legacy?.possibly_sensitive === true || node.possibly_sensitive === true || hasAdultMedia(node);
+    if (!reply && !original?.rest_id && !quoted?.rest_id && !sensitive) return null;
     return {
       id: node.rest_id,
       reply,
       repostOf: original?.rest_id ?? null,
       quotedId: quoted?.rest_id ?? null,
       quotedAuthor: quotedAuthor?.core?.screen_name ?? quotedAuthor?.legacy?.screen_name ?? null,
+      sensitive,
     };
+  }
+
+  // Timeline entries for ads carry promoted_metadata next to the post itself:
+  // { __typename: 'TimelineTweet', tweet_results: {...}, promoted_metadata: { disclosure_type, impression_id } }.
+  function pickPromoted(node) {
+    const meta = node.promoted_metadata ?? node.promotedMetadata;
+    if (!meta || typeof meta !== 'object') return null;
+    const tweet = unwrapTweet(node.tweet_results ?? node.tweetResults ?? node.tweet);
+    return typeof tweet?.rest_id === 'string' ? tweet.rest_id : null;
+  }
+
+  // Sidebar/feed boxes X builds as timeline modules: account suggestions ("Who to
+  // follow", "Creators for you"…) have user items, "What's happening" has trend
+  // items. X sends their heading in the reader's language, so we pass the heading
+  // and "Show more" link on for matching.
+  function pickModule(node) {
+    if (!Array.isArray(node.items) || !node.items.length) return null;
+    const typeOf = (entry) => {
+      const c = entry?.item?.content ?? entry?.item?.itemContent ?? entry?.item;
+      const t = c?.__typename ?? c?.itemType;
+      if (t === 'TimelineUser' || c?.user_results) return 'people';
+      if (t === 'TimelineTrend' || c?.trend) return 'trends';
+      return null;
+    };
+    const kind = node.items.map(typeOf).find(Boolean);
+    if (!kind) return null;
+    const header = node.header?.text ?? node.header?.title ?? null;
+    const url = node.footer?.landing_url?.url ?? node.footer?.url ?? null;
+    if (typeof header !== 'string' && typeof url !== 'string') return null;
+    return { kind, header: typeof header === 'string' ? header : null, url: typeof url === 'string' ? url : null };
   }
 
   function collect(root) {
     const found = new Map();
     const posts = [];
+    const promoted = [];
+    const modules = [];
+    const about = [];
     const stack = [root];
     const seen = new Set();
     while (stack.length) {
@@ -141,6 +219,12 @@
         }
         const post = pickPost(node);
         if (post) posts.push(post);
+        const ad = pickPromoted(node);
+        if (ad) promoted.push(ad);
+        const module = pickModule(node);
+        if (module) modules.push(module);
+        const info = pickAbout(node);
+        if (info) about.push(info);
       }
       for (const key in node) {
         let v;
@@ -152,14 +236,14 @@
         if (v && typeof v === 'object') stack.push(v);
       }
     }
-    return { users: [...found.values()], posts };
+    return { users: [...found.values()], posts, promoted, modules, about };
   }
 
   function publish(data) {
     try {
-      const { users, posts } = collect(data);
-      if (users.length || posts.length) {
-        window.postMessage({ source: SOURCE, type: 'users', users, posts }, window.location.origin);
+      const { users, posts, promoted, modules, about } = collect(data);
+      if (users.length || posts.length || promoted.length || modules.length || about.length) {
+        window.postMessage({ source: SOURCE, type: 'users', users, posts, promoted, modules, about }, window.location.origin);
       }
     } catch {
       // Never let our parsing break the page.
@@ -231,8 +315,45 @@
     } catch {}
   }
 
+  // --- 3. sidebar headings in the reader's language ---
+  // Some boxes ("Subscribe to Premium", "Live on X", "What's happening"…) are
+  // titled by X's own translations rather than by data. Ask X's i18n for the
+  // current wording so the content script can match it in any language.
+  const HEADING_KEYS = {
+    people: ['Who to follow', 'You might like', 'Creators for you'],
+    trends: ['What’s happening', 'Trends for you'],
+    premium: ['Subscribe to Premium'],
+    live: ['Live on X'],
+  };
+  let lastHeadings = '';
+  function publishHeadings() {
+    try {
+      const matches = window.__TSR_ROUTER__?.state?.matches ?? [];
+      const i18n = matches.find((m) => typeof m?.context?.i18n?.t === 'function')?.context.i18n;
+      if (!i18n) return;
+      const modules = [];
+      for (const [kind, keys] of Object.entries(HEADING_KEYS)) {
+        for (const key of keys) {
+          const header = i18n.t(key);
+          if (typeof header === 'string' && header) modules.push({ kind, header, url: null });
+        }
+      }
+      const json = JSON.stringify(modules);
+      if (json === lastHeadings) return;
+      lastHeadings = json;
+      window.postMessage({ source: SOURCE, type: 'users', users: [], posts: [], promoted: [], modules }, window.location.origin);
+    } catch {}
+  }
+  // Translations load lazily, so look again for a while after the page opens.
+  let headingChecks = 0;
+  const headingTimer = setInterval(() => {
+    publishHeadings();
+    if (++headingChecks >= 40) clearInterval(headingTimer);
+  }, 3000);
+
   // --- data embedded in the initial HTML by the older X client ---
   document.addEventListener('DOMContentLoaded', () => {
     if (window.__INITIAL_STATE__) publish(window.__INITIAL_STATE__);
+    publishHeadings();
   });
 })();
