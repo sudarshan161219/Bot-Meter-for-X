@@ -35,7 +35,8 @@
     premium: {
       setting: 'hidePremium',
       headers: new Set(['subscribe to premium']),
-      paths: new Set(['/i/premium_sign_up']),
+      // Matched by heading only: the sign-up link is also the left menu's "Premium" item.
+      paths: new Set(),
       homePage: (path) => path.startsWith('/i/premium') || path.startsWith('/i/verified'),
     },
     live: {
@@ -46,6 +47,9 @@
     },
   };
   const HEADINGS = 'h1, h2, h3, h4, [role="heading"]';
+  // Never grow a box into these: posts, the search box, or X's left menu
+  // (the only place with a Home link; it also holds the account switcher).
+  const NEVER_INSIDE = 'article, input, [role="search"], a[href="/home"]';
   const norm = (text) => text.trim().toLowerCase().replace(/[‘’]/g, "'");
   let settings = { ...DEFAULTS };
   let scanTimer = null;
@@ -261,13 +265,14 @@
     for (const entry of document.querySelectorAll('[data-timeline-entry]')) {
       if (!entry.querySelector('article') && opensWithHeader(norm(entry.textContent))) add(wrapper(entry));
     }
-    // The card around a heading X sent for this kind of box…
-    for (const h of document.querySelectorAll(HEADINGS)) {
-      if (box.headers.has(norm(h.textContent))) add(cardAround(h));
+    // The card around a title matching this kind of box (a heading tag, or plain
+    // text: X doesn't always mark card titles up as headings)…
+    for (const title of titlesOutsideFeed()) {
+      if (box.headers.has(norm(title.textContent))) add(cardAround(title));
     }
     // …or around its "Show more" link.
     for (const a of document.querySelectorAll('a[href]')) {
-      // The left menu's own links (e.g. "Premium") aren't boxes.
+      // The left menu's own links aren't boxes.
       if (a.closest('nav, header, [role="navigation"]')) continue;
       const p = a.getAttribute('href').split(/[?#]/)[0].toLowerCase();
       if (box.paths.has(p) || (box === BOXES.people && p.endsWith('/who_to_follow'))) add(cardAround(a));
@@ -275,29 +280,53 @@
     return found;
   }
 
-  // The whole card around `start`: climb while the container still holds just
-  // this one card (at most one heading, no posts, no search box), so the card's
-  // own frame and border go too.
+  // Heading tags anywhere, plus elements whose own text could be a card title,
+  // skipping the feed, posts and menus (their text is never a sidebar title).
+  function titlesOutsideFeed() {
+    const titles = new Set(document.querySelectorAll(HEADINGS));
+    const skip = 'main, [role="main"], article, nav, header, script, style, [data-timeline-entry]';
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) =>
+        node.nodeType === Node.ELEMENT_NODE
+          ? node.matches(skip)
+            ? NodeFilter.FILTER_REJECT
+            : NodeFilter.FILTER_SKIP
+          : node.textContent.trim().length > 2 && node.textContent.length < 60
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_SKIP,
+    });
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) titles.add(node.parentElement);
+    return titles;
+  }
+
+  // The whole card around `start` (a heading or "Show more" link): climb until
+  // the card's content is included, then only through wrappers that hold
+  // nothing else (frames, borders), so neighbouring cards are never swallowed.
   function cardAround(start) {
     if (start.closest('article')) return null;
     const entry = start.closest('[data-timeline-entry]');
     if (entry) return entry.querySelector('article') ? null : wrapper(entry);
+    const startText = start.textContent.trim().length;
     let el = start;
     while (el.parentElement) {
       const p = el.parentElement;
-      if (p === document.body || p.matches('main, [role="main"], nav, header')) break;
-      if (p.querySelector('article, input, [role="search"]')) break;
+      if (p === document.body || p.matches('main, [role="main"], nav, header, aside, [role="complementary"]')) break;
+      if (p.querySelector(NEVER_INSIDE)) break;
       if (p.querySelectorAll(HEADINGS).length > 1) break;
+      // Once `el` holds more than the heading/link itself, it is the card:
+      // keep climbing only while the parent has nothing else in it.
+      const hasCard = el.textContent.trim().length > startText;
+      if (hasCard && ![...p.children].every((c) => c === el || isBlank(c))) break;
       el = p;
     }
-    return el === start ? null : wrapper(el);
+    return el === start ? null : el;
   }
 
   // Grow `el` over parents that hold nothing else (empty wrappers, border frames).
   function wrapper(el) {
     for (let i = 0; i < 6 && el.parentElement; i++) {
       const p = el.parentElement;
-      if (p === document.body || p.matches('main, [role="main"]') || p.querySelector('article, input')) break;
+      if (p === document.body || p.matches('main, [role="main"]') || p.querySelector(NEVER_INSIDE)) break;
       if (![...p.children].every((c) => c === el || isBlank(c))) break;
       el = p;
     }

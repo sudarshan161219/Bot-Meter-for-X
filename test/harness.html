@@ -31,6 +31,8 @@
       .inner h2 { margin: 0; font-size: 18px; }
       .divider { height: 1px; background: #536471; }
       .foot { color: #71767b; font-size: 13px; }
+      .column { display: grid; gap: 12px; }
+      .title { font-weight: 800; font-size: 18px; }
       .leftnav { padding: 8px 16px; border-bottom: 1px solid #2f3336; }
       .col { display: flex; flex-direction: column; align-items: flex-start; }
       .ad { margin-left: auto; }
@@ -101,7 +103,11 @@
         <label><input type="checkbox" id="hideLive" checked /> Hide live</label>
       </div>
 
-      <nav class="leftnav" aria-label="Primary"><a href="/home">Home</a> · <a href="/i/premium_sign_up">Premium</a></nav>
+      <!-- Left menu like X's: plain divs (no <nav>), a Premium link, and the account switcher. -->
+      <div class="leftnav">
+        <div class="items"><a href="/home">Home</a> · <a href="/explore">Explore</a> · <a href="/i/premium_sign_up">Premium</a></div>
+        <div class="account"><span>Sudarshan</span> <span>@buildwithSud</span></div>
+      </div>
       <!-- Mirrors x-web (2026) markup: no data-testid; post text in dir="auto". -->
       <main>
       <div class="profile">
@@ -186,32 +192,35 @@
         <div dir="auto">No data for this account, so no badge.</div>
       </article></div>
       </main>
-      <!-- Sidebar like X's: search, then cards wrapped in bordered frames, then footer links. -->
+      <!-- Sidebar like X's: the search box sits in its own sticky container, outside the card
+           column, and only some cards title themselves with a heading tag. -->
       <aside class="sidebar">
         <div class="search"><input type="search" placeholder="Search" /></div>
-        <div class="frame"><div class="inner">
-          <h2>Subscribe to Premium</h2>
-          <p>Subscribe to unlock new features.</p>
-          <a class="more" href="/i/premium_sign_up">Subscribe</a>
-        </div></div>
-        <div class="frame"><div class="inner">
-          <h2>En directo en X</h2>
-          <a class="more" href="/i/broadcasts/2xyz">NASA is hosting a Space</a>
-        </div></div>
-        <div class="frame"><div class="inner">
-          <h2>Who to follow</h2>
-          <div class="head"><span><a href="/suggested_one">Suggested One</a></span> <span><a href="/suggested_one">@suggested_one</a></span></div>
-          <div class="head"><span><a href="/suggested_two">Suggested Two</a></span> <span><a href="/suggested_two">@suggested_two</a></span></div>
-          <a class="more" href="/i/connect_people">Show more</a>
-        </div></div>
-        <div class="divider"></div>
-        <div class="frame"><div class="inner">
-          <h2>What’s happening</h2>
-          <div role="link">#Starliner · 12k posts</div>
-          <div role="link">#Artemis · 8k posts</div>
-          <a class="more" href="/explore/tabs/for-you">Show more</a>
-        </div></div>
-        <nav class="foot">Terms of Service · Privacy Policy · © 2026 X Corp.</nav>
+        <div class="column">
+          <div class="frame"><div class="inner">
+            <h2>Subscribe to Premium</h2>
+            <p>Subscribe to unlock new features.</p>
+            <a class="more" href="/i/premium_sign_up">Subscribe</a>
+          </div></div>
+          <div class="frame"><div class="inner">
+            <div class="title">En directo en X</div>
+            <a class="more" href="/i/broadcasts/2xyz">NASA is hosting a Space</a>
+          </div></div>
+          <div class="frame"><div class="inner">
+            <div class="title">Who to follow</div>
+            <div class="head"><span><a href="/suggested_one">Suggested One</a></span> <span><a href="/suggested_one">@suggested_one</a></span></div>
+            <div class="head"><span><a href="/suggested_two">Suggested Two</a></span> <span><a href="/suggested_two">@suggested_two</a></span></div>
+            <a class="more" href="/i/connect_people">Show more</a>
+          </div></div>
+          <div class="divider"></div>
+          <div class="frame"><div class="inner">
+            <div class="title">What’s happening</div>
+            <div role="link">#Starliner · 12k posts</div>
+            <div role="link">#Artemis · 8k posts</div>
+            <a class="more" href="/explore/tabs/for-you">Show more</a>
+          </div></div>
+          <nav class="foot">Terms of Service · Privacy Policy · © 2026 X Corp.</nav>
+        </div>
       </aside>
     </div>
     <script>
