@@ -16,3 +16,12 @@ export interface OpenPrintMessage {
 
 /** Key in chrome.storage.session where the print page finds its content. */
 export const printKey = (id: string): string => `print:${id}`;
+
+/** Content script -> service worker: bookmarks seen on x.com/i/bookmarks (validated again there). */
+export interface SaveBookmarksMessage {
+  type: 'bookmarks:save';
+  items: { tweet: unknown; order: number }[];
+}
+
+/** Service worker -> extension pages: the saved bookmarks changed. */
+export const BOOKMARKS_CHANGED = 'bookmarks:changed';

@@ -10,6 +10,7 @@
 //   src/creator/tools/content.ts      -> creator-tools/gen/content.js     (extension world)
 //   src/creator/tools/background.ts   -> creator-tools/gen/background.js  (service worker)
 //   src/creator/tools/print.ts        -> creator-tools/gen/print.js       (print.html)
+//   src/creator/tools/bookmarks.ts    -> creator-tools/gen/bookmarks.js   (bookmarks.html, Bookmark Brain)
 import { cpSync } from 'node:fs';
 import { build } from 'vite';
 
@@ -20,6 +21,7 @@ const entries = [
   ['creator-tools/gen', 'content', 'src/creator/tools/content.ts'],
   ['creator-tools/gen', 'background', 'src/creator/tools/background.ts'],
   ['creator-tools/gen', 'print', 'src/creator/tools/print.ts'],
+  ['creator-tools/gen', 'bookmarks', 'src/creator/tools/bookmarks.ts'],
 ];
 
 for (const [outDir, name, entry] of entries) {

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bookmark Brain</title>
+    <link rel="icon" href="icons/icon32.png" />
+    <link rel="stylesheet" href="bookmarks.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <img src="icons/icon32.png" alt="" width="28" height="28" />
+        <div>
+          <h1>Bookmark Brain</h1>
+          <p id="summary" class="muted">Loading…</p>
+        </div>
+      </div>
+      <div class="actions">
+        <details class="menu" id="export-menu">
+          <summary>Export</summary>
+          <div class="menu-items">
+            <button type="button" data-export="json">JSON (for moving to a new machine)</button>
+            <button type="button" data-export="csv">CSV (spreadsheets)</button>
+            <button type="button" data-export="markdown">Markdown, grouped by tag</button>
+          </div>
+        </details>
+        <label class="button" title="Import a Bookmark Brain JSON export">
+          Import<input id="import" type="file" accept=".json,application/json" hidden />
+        </label>
+        <button type="button" id="rules-button">Tag rules</button>
+        <button type="button" id="delete-all" class="danger">Delete all data</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="filters" aria-label="Search and filters">
+        <input id="search" type="search" placeholder="Search text, people, links, tags, notes" autocomplete="off" />
+        <label class="field">
+          <span>Sort</span>
+          <select id="sort">
+            <option value="relevance">Best match</option>
+            <option value="bookmarked" selected>Date bookmarked</option>
+            <option value="posted">Date posted</option>
+            <option value="engagement">Engagement</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Author</span>
+          <select id="author"><option value="">Everyone</option></select>
+        </label>
+        <div class="field dates">
+          <span>Posted</span>
+          <label><span class="sr">From</span><input id="from" type="date" /></label>
+          <span class="muted">to</span>
+          <label><span class="sr">To</span><input id="to" type="date" /></label>
+        </div>
+        <label class="check"><input id="has-media" type="checkbox" /> Has photos or video</label>
+        <label class="check"><input id="has-links" type="checkbox" /> Has links</label>
+        <label class="field">
+          <span>At least</span>
+          <span><input id="min-likes" type="number" min="0" step="1" value="0" /> likes</span>
+        </label>
+        <div class="field">
+          <span>Tags</span>
+          <div id="tag-filter" class="chips"></div>
+        </div>
+        <button type="button" id="clear-filters" class="link">Clear filters</button>
+      </aside>
+
+      <main>
+        <p id="message" class="message" role="status" hidden></p>
+        <div id="list" class="list"></div>
+        <button type="button" id="more" class="more" hidden>Show more</button>
+      </main>
+    </div>
+
+    <dialog id="rules">
+      <form method="dialog">
+        <h2>Tag rules</h2>
+        <p class="muted">
+          Suggested tags come from these rules: one per line, <code>tag: keyword, another keyword</code>.
+          A post that mentions a keyword (or links to it) gets the tag suggested.
+        </p>
+        <textarea id="rules-text" rows="14" spellcheck="false"></textarea>
+        <div class="dialog-actions">
+          <button type="button" id="rules-reset" class="link">Restore defaults</button>
+          <button value="cancel">Cancel</button>
+          <button value="save" class="primary">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="gen/bookmarks.js"></script>
+  </body>
+</html>

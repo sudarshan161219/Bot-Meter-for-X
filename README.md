@@ -86,6 +86,20 @@ has already loaded, makes no requests of its own, and needs only the `storage` p
     light, dark or brand-color themes.
   - **PDF:** a clean reading layout in a new tab with the print dialog; choose "Save as PDF".
   - **Copy text:** the unrolled thread, numbered, to the clipboard.
+- **Bookmark Brain:** while you browse `x.com/i/bookmarks`, every bookmark that loads is saved
+  to the extension's own IndexedDB (never x.com's storage, never a server). A small bar on that
+  page shows the count and offers **Sync all**, which scrolls slowly (every 1.5–3 s, randomized)
+  until nothing new loads three times in a row; you can stop it at any time. Click the toolbar
+  icon to open the Bookmark Brain page:
+  - Instant search across text, authors, links, tags and notes (MiniSearch).
+  - Filters: author, posted date range, has media, has links, minimum likes; sort by date
+    bookmarked, date posted, engagement or best match.
+  - Your own tags and a note per bookmark, plus suggested tags from keyword rules you can edit.
+  - Export JSON, CSV or Markdown (grouped by tag); import JSON on another machine.
+  - Storage used and **Delete all data**.
+
+  X doesn't say when you bookmarked something, only lists bookmarks newest first, so "date
+  bookmarked" is that order as Bookmark Brain saw it.
 
 To try it: `npm run build:creator`, then **Load unpacked** and pick the `creator-tools/` folder.
 `npm run build:tools` makes the store zip in `dist/`.
@@ -102,7 +116,10 @@ Bot Meter's core (`src/*.js`) is plain JavaScript with no build step. Creator To
 - `creator-tools/gen/` holds the Creator Tools extension's bundles: its own page hook
   (`src/creator/capture/hook.ts`, a typed copy of `inject.js`'s), content script, service worker
   and print page. Thread assembly, the export formats, slide layout and the zip writer in
-  `src/creator/thread-exporter/` are pure and unit-tested.
+  `src/creator/thread-exporter/` are pure and unit-tested. Bookmark Brain
+  (`src/creator/bookmark-brain/`) keeps its data in Dexie (`db.ts`, versioned schema), saved by
+  the service worker; its filters, search, tag rules and exports are pure and tested, the
+  database against fake-indexeddb.
 - The Reply Filter's heuristics are pure functions in `src/creator/reply-filter/rules.ts`; its
   settings sit with the core's in `src/settings.js`, and paid-feature checks in
   `src/creator/entitlements.ts`.

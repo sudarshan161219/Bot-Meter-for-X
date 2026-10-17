@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Creator Tools for X",
   "version": "0.1.0",
-  "description": "Export X (Twitter) threads as Markdown, image carousels, PDF or plain text. Runs on your device; no account or server.",
+  "description": "Export X (Twitter) threads as Markdown, image carousels or PDF, and search, tag and export your X bookmarks. Everything stays on your device.",
   "permissions": [
     "storage"
   ],
@@ -11,6 +11,15 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Open Bookmark Brain",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "background": {
     "service_worker": "gen/background.js"

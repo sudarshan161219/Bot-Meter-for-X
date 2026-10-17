@@ -9,7 +9,7 @@ import { postUrl, threadTitle } from './formats';
 const LINK = /https:\/\/[^\s<>"]+[^\s<>".,;:!?)\]'’”]/g;
 
 /** Appends text with its https links made clickable. */
-function appendLinked(parent: HTMLElement, text: string): void {
+export function appendLinked(parent: HTMLElement, text: string): void {
   const doc = parent.ownerDocument;
   let last = 0;
   for (const m of text.matchAll(LINK)) {
@@ -17,6 +17,8 @@ function appendLinked(parent: HTMLElement, text: string): void {
     if (at > last) parent.append(text.slice(last, at));
     const a = doc.createElement('a');
     a.href = m[0];
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
     a.textContent = m[0].replace(/^https:\/\/(www\.)?/, '');
     parent.append(a);
     last = at + m[0].length;

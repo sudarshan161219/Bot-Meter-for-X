@@ -9,7 +9,8 @@
 // Both extensions can be installed together: the $R trap chains onto one that's
 // already there, and fetch/XHR wrappers stack.
 
-type Sink = (data: unknown) => void;
+/** Receives each response body, with its URL (null for the server-rendered stream). */
+type Sink = (data: unknown, url: string | null) => void;
 
 export interface HookTarget {
   fetch: typeof fetch;
@@ -22,9 +23,9 @@ const isApiUrl = (url: unknown): boolean =>
   typeof url === 'string' && (url.includes('/graphql/') || url.includes('/i/api/'));
 
 export function installHook(win: HookTarget, sink: Sink): void {
-  const safeSink: Sink = (data) => {
+  const safeSink: Sink = (data, url) => {
     try {
-      sink(data);
+      sink(data, url);
     } catch {
       // Never let parsing break the page.
     }
@@ -42,7 +43,7 @@ export function installHook(win: HookTarget, sink: Sink): void {
           // Wait until the current <script> finishes so objects are fully built.
           timer ??= win.setTimeout(() => {
             timer = null;
-            safeSink(pending.splice(0));
+            safeSink(pending.splice(0), null);
           }, 0);
         }
         return true;
@@ -84,7 +85,7 @@ export function installHook(win: HookTarget, sink: Sink): void {
         res
           .clone()
           .json()
-          .then(safeSink, () => {});
+          .then((data: unknown) => safeSink(data, res.url), () => {});
       }
     } catch {}
     return res;
@@ -102,9 +103,10 @@ export function installHook(win: HookTarget, sink: Sink): void {
   proto.send = function (this: XMLHttpRequest, body?: Document | XMLHttpRequestBodyInit | null) {
     if (isApiUrl(urls.get(this))) {
       this.addEventListener('load', function (this: XMLHttpRequest) {
+        const url = urls.get(this) ?? null;
         try {
-          if (this.responseType === '' || this.responseType === 'text') safeSink(JSON.parse(this.responseText));
-          else if (this.responseType === 'json') safeSink(this.response);
+          if (this.responseType === '' || this.responseType === 'text') safeSink(JSON.parse(this.responseText), url);
+          else if (this.responseType === 'json') safeSink(this.response, url);
         } catch {}
       });
     }

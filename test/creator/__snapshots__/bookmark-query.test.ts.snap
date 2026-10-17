@@ -1,0 +1,23 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`export and import > groups Markdown by tag, untagged last 1`] = `
+"# Bookmarks
+
+Exported 2026-10-01 · 3 bookmarks
+
+## ai
+
+- [@maya_writes](https://x.com/maya_writes/status/1) (2026-01-05): New LLM benchmark results https://t.co/x
+- [@maya_writes](https://x.com/maya_writes/status/2) (2026-03-01): A tiny Rust parser
+  - Note: compare with ours
+
+## dev
+
+- [@maya_writes](https://x.com/maya_writes/status/2) (2026-03-01): A tiny Rust parser
+  - Note: compare with ours
+
+## Untagged
+
+- [@Other](https://x.com/Other/status/3) (2026-06-20): Sunset photo
+"
+`;
