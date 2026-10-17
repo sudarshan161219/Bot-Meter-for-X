@@ -5,11 +5,14 @@
 //   parser loaded, those messages carry normalized `tweets` and `authors`.
 // - DOM fallback: after each core page scan, posts that never arrived as data
 //   are read from the page (partial, marked source: 'dom').
+// - Reply Filter: flags, collapses or hides low-effort replies on post pages.
 
 import { readArticle } from '../capture/dom-fallback';
 import { coerceCapture } from '../capture/validate';
 import { getCore } from '../core';
 import { fail, isDisabled, warnOnce } from '../log';
+import { startReplyFilter } from '../reply-filter';
+import { watchSettings } from '../settings';
 import { isObj } from '../util';
 import { cache } from './store';
 
@@ -61,6 +64,7 @@ if (!core) {
       fail('dom-fallback', error);
     }
   });
+  startReplyFilter(core, cache, watchSettings);
 }
 
 // For manual checks: in DevTools, pick the "Bot Meter for X" context in the

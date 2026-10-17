@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseGraphQL } from '../../src/creator/capture/parse-graphql';
+import { parseAuthor, parseGraphQL } from '../../src/creator/capture/parse-graphql';
 import { replayPage } from './replay';
 
 const NASA_POST = '2103610284464316469';
@@ -159,5 +159,15 @@ describe('parseGraphQL on the older format and edge cases', () => {
     for (const junk of [null, undefined, 42, 'x', [], {}, cyclic, { __typename: 'Tweet' }, { __typename: 'User', core: {} }]) {
       expect(parseGraphQL(junk)).toEqual({ tweets: [], authors: [] });
     }
+  });
+});
+
+describe('parseAuthor', () => {
+  const user = { __typename: 'User', rest_id: '11348282', core: { screen_name: 'NASA', name: 'NASA' } };
+
+  it('records whether the viewer follows the account, only when X says', () => {
+    expect(parseAuthor({ ...user, relationship_perspectives: { following: true } })?.followedByViewer).toBe(true);
+    expect(parseAuthor({ ...user, legacy: { following: false } })?.followedByViewer).toBe(false);
+    expect(parseAuthor(user)).not.toHaveProperty('followedByViewer'); // signed out: unknown
   });
 });

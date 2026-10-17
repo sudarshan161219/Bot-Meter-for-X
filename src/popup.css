@@ -31,7 +31,7 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 h1 {
@@ -63,7 +63,8 @@ h1 {
 }
 
 input[type="number"],
-select {
+select,
+textarea {
   background: var(--field);
   color: var(--fg);
   border: 1px solid var(--line);
@@ -165,4 +166,75 @@ footer a {
 
 footer a:hover {
   text-decoration: underline;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 -16px 2px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs button {
+  padding: 4px 2px 6px;
+  margin-right: 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tabs button[aria-selected="true"] {
+  color: var(--fg);
+  border-bottom-color: var(--accent);
+}
+
+.stack {
+  display: grid;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.stack small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font-size: 13px;
+}
+
+.slider {
+  cursor: default;
+}
+
+.range {
+  display: grid;
+  width: 150px;
+}
+
+.range input {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.ticks i {
+  font-style: normal;
 }

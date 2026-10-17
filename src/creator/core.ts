@@ -19,6 +19,12 @@ export interface CoreHelpers {
 }
 
 export interface BotMeterCore extends CoreHelpers {
+  /**
+   * Where Bot Meter puts the badge for an author link: the link itself or the
+   * name/handle row around it. Its own badge goes right after this element, so
+   * anything else should go after that badge.
+   */
+  badgeAnchor(link: Element): Element;
   /** Bot Meter's posts-per-day score for an account, if its data has been seen. */
   lookup(handle: string): { stats: CoreStats } | null;
   /** Runs after each of the core's (debounced) page scans; returns an unsubscribe function. */
@@ -31,6 +37,7 @@ export function getCore(): BotMeterCore | null {
   const c = core as Partial<BotMeterCore>;
   return typeof c.authorHandle === 'function' &&
     typeof c.postId === 'function' &&
+    typeof c.badgeAnchor === 'function' &&
     typeof c.lookup === 'function' &&
     typeof c.onScan === 'function'
     ? (core as BotMeterCore)

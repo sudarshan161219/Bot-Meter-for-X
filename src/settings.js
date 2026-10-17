@@ -22,4 +22,12 @@ globalThis.BOT_METER_DEFAULTS = {
   hideTrends: true,
   hidePremium: true,
   hideLive: true,
+  // Creator Tools > Reply Filter (on status pages). Mode: 'badge' | 'collapse' | 'hide'.
+  replyFilter: true,
+  replyFilterMode: 'badge',
+  // 'lenient' | 'balanced' | 'strict'
+  replyFilterSensitivity: 'balanced',
+  // Comma- or line-separated: handles never filtered, and words that always filter a reply.
+  replyFilterAllow: '',
+  replyFilterMuted: '',
 };

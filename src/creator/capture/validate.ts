@@ -70,7 +70,7 @@ export function coerceAuthor(x: unknown): Author | null {
   const id = str(x.id);
   const handle = str(x.handle);
   if (!id || !ID.test(id) || !handle || !HANDLE.test(handle)) return null;
-  return {
+  const author: Author = {
     id,
     handle,
     name: str(x.name) ?? '',
@@ -81,6 +81,8 @@ export function coerceAuthor(x: unknown): Author | null {
     verified: x.verified === true,
     bio: str(x.bio),
   };
+  if (typeof x.followedByViewer === 'boolean') author.followedByViewer = x.followedByViewer;
+  return author;
 }
 
 export function coerceCapture(x: unknown): Capture {

@@ -575,6 +575,7 @@
   globalThis.BotMeterCore = Object.freeze({
     authorHandle,
     postId,
+    badgeAnchor,
     lookup: (handle) => lookup(handle),
     onScan(fn) {
       scanListeners.add(fn);

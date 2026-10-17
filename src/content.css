@@ -64,11 +64,16 @@ article.bm-blur > * {
   display: none !important;
 }
 
-article.bm-collapsed {
+article.bm-collapsed,
+article.bmc-collapsed,
+article.bmc-hidden {
   display: none !important;
 }
 
-.bm-notice {
+/* .bmc-*: Creator Tools (src/creator). The Reply Filter's notices and counter look like Bot Meter's own. */
+.bm-notice,
+.bmc-notice,
+.bmc-counter {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -79,7 +84,9 @@ article.bm-collapsed {
   border-bottom: 1px solid rgba(113, 118, 123, 0.3);
 }
 
-.bm-notice button {
+.bm-notice button,
+.bmc-notice button,
+.bmc-counter button {
   flex-shrink: 0;
   padding: 4px 14px;
   border-radius: 999px;
@@ -93,6 +100,38 @@ article.bm-collapsed {
   cursor: pointer;
 }
 
-.bm-notice button:hover {
+.bm-notice button:hover,
+.bmc-notice button:hover,
+.bmc-counter button:hover {
   background: rgba(113, 118, 123, 0.15);
+}
+
+.bmc-counter {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.bmc-counter button[hidden] {
+  display: none;
+}
+
+/* Reply Filter flag, next to the @handle (after Bot Meter's badge). */
+.bmc-flag {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  flex-shrink: 0;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px dashed rgba(232, 89, 12, 0.7);
+  color: #e8590c;
+  font: 600 12px/18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.bmc-flag.bmc-strong {
+  border-color: rgba(224, 36, 94, 0.75);
+  color: #e0245e;
 }

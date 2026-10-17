@@ -31,7 +31,7 @@ export function parseAuthor(node: Obj): Author | null {
   const id = str(node.rest_id) ?? str(node.id_str);
   const handle = str(get(core, 'screen_name')) ?? str(get(legacy, 'screen_name'));
   if (!id || !handle) return null;
-  return {
+  const author: Author = {
     id,
     handle,
     name: str(get(core, 'name')) ?? str(get(legacy, 'name')) ?? '',
@@ -45,6 +45,10 @@ export function parseAuthor(node: Obj): Author | null {
     verified: get(node, 'verification', 'is_blue_verified') === true || node.is_blue_verified === true,
     bio: str(get(node, 'profile_bio', 'description')) ?? str(get(legacy, 'description')),
   };
+  // Only in signed-in responses.
+  const follows = get(node, 'relationship_perspectives', 'following') ?? get(legacy, 'following');
+  if (typeof follows === 'boolean') author.followedByViewer = follows;
+  return author;
 }
 
 const MEDIA_TYPES: Record<string, MediaType> = { photo: 'photo', video: 'video', animated_gif: 'gif' };

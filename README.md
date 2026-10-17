@@ -25,6 +25,12 @@ An account that has averaged 200 posts a day for years is very likely automated.
   and "Live on X", in the feed and sidebar, each with its own switch. Ads are found by X's
   `promoted_metadata`; boxes by their heading, read from X's data or X's own translations, so it
   works in any language. The whole card goes, including its border.
+- **Reply Filter** (popup → Creator Tools): on a post's page, flags low-effort and bot replies:
+  stock replies ("great post", "this", 🔥🔥), text copy-pasted by several accounts, Telegram and
+  crypto promotion, "follow back" bait, and accounts Bot Meter rates as likely bots. Show a badge
+  (the default), collapse them behind "Show", or hide them, with a lenient/balanced/strict slider,
+  a never-filter list and muted keywords. The post's own author and people you follow are never
+  filtered. A line under the post counts them: "Filtered 23 of 140 replies".
 - Thresholds and behavior are configurable from the toolbar popup.
 
 ## Install
@@ -75,6 +81,9 @@ Bot Meter's core (`src/*.js`) is plain JavaScript with no build step. Creator To
   turns every response `inject.js` sees into normalized posts (`src/creator/types.ts`).
 - `src/gen/creator-content.js` runs after `content.js`, keeps the shared post cache, and reuses the
   core's page scan and helpers through `globalThis.BotMeterCore`.
+- The Reply Filter's heuristics are pure functions in `src/creator/reply-filter/rules.ts`; its
+  settings sit with the core's in `src/settings.js`, and paid-feature checks in
+  `src/creator/entitlements.ts`.
 
 ```
 npm run build:creator                 # build src/gen/ (needed before loading unpacked)

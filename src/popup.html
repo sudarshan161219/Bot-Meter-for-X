@@ -11,76 +11,123 @@
       <h1>Bot Meter for X</h1>
     </header>
 
+    <nav class="tabs" role="tablist">
+      <button type="button" role="tab" id="tab-core" aria-controls="panel-core" aria-selected="true">Bot Meter</button>
+      <button type="button" role="tab" id="tab-creator" aria-controls="panel-creator" aria-selected="false">Creator Tools</button>
+    </nav>
+
     <form id="form">
-      <label class="row">
-        <span>Enabled</span>
-        <input type="checkbox" name="enabled" />
-      </label>
+      <section id="panel-core" role="tabpanel" aria-labelledby="tab-core">
+        <label class="row">
+          <span>Enabled</span>
+          <input type="checkbox" name="enabled" />
+        </label>
 
-      <label class="row" title="Off: only flag high-rate accounts">
-        <span>Badge on every account</span>
-        <input type="checkbox" name="showAll" />
-      </label>
+        <label class="row" title="Off: only flag high-rate accounts">
+          <span>Badge on every account</span>
+          <input type="checkbox" name="showAll" />
+        </label>
 
-      <label class="row">
-        <span><i class="dot warn"></i>High rate at</span>
-        <span class="num"><input type="number" name="warnRate" min="1" step="1" /> /day</span>
-      </label>
+        <label class="row">
+          <span><i class="dot warn"></i>High rate at</span>
+          <span class="num"><input type="number" name="warnRate" min="1" step="1" /> /day</span>
+        </label>
 
-      <label class="row">
-        <span><i class="dot bot"></i>Likely bot at</span>
-        <span class="num"><input type="number" name="botRate" min="1" step="1" /> /day</span>
-      </label>
+        <label class="row">
+          <span><i class="dot bot"></i>Likely bot at</span>
+          <span class="num"><input type="number" name="botRate" min="1" step="1" /> /day</span>
+        </label>
 
-      <label class="row">
-        <span>Posts from likely bots</span>
-        <select name="botAction">
-          <option value="label">Just label</option>
-          <option value="dim">Dim</option>
-          <option value="collapse">Collapse</option>
-        </select>
-      </label>
+        <label class="row">
+          <span>Posts from likely bots</span>
+          <select name="botAction">
+            <option value="label">Just label</option>
+            <option value="dim">Dim</option>
+            <option value="collapse">Collapse</option>
+          </select>
+        </label>
 
-      <label class="row" title="Uses X's own sensitive-content flags on posts, media and accounts">
-        <span>Adult (18+) content</span>
-        <select name="adultAction">
-          <option value="off">Off</option>
-          <option value="label">Label</option>
-          <option value="blur">Blur</option>
-          <option value="hide">Hide</option>
-        </select>
-      </label>
+        <label class="row" title="Uses X's own sensitive-content flags on posts, media and accounts">
+          <span>Adult (18+) content</span>
+          <select name="adultAction">
+            <option value="off">Off</option>
+            <option value="label">Label</option>
+            <option value="blur">Blur</option>
+            <option value="hide">Hide</option>
+          </select>
+        </label>
 
-      <label class="row" title="NSFW, 18+, OnlyFans, 🔞 in posts and display names">
-        <span>Also match adult words</span>
-        <input type="checkbox" name="adultWords" />
-      </label>
+        <label class="row" title="NSFW, 18+, OnlyFans, 🔞 in posts and display names">
+          <span>Also match adult words</span>
+          <input type="checkbox" name="adultWords" />
+        </label>
 
-      <fieldset>
-        <legend title="Off: no badge, never dimmed or collapsed as a bot">Check these posts for bots</legend>
-        <div class="chips">
-          <label><input type="checkbox" name="onReplies" /> Replies</label>
-          <label><input type="checkbox" name="onReposts" /> Reposts</label>
-          <label><input type="checkbox" name="onQuotes" /> Quoted posts</label>
+        <fieldset>
+          <legend title="Off: no badge, never dimmed or collapsed as a bot">Check these posts for bots</legend>
+          <div class="chips">
+            <label><input type="checkbox" name="onReplies" /> Replies</label>
+            <label><input type="checkbox" name="onReposts" /> Reposts</label>
+            <label><input type="checkbox" name="onQuotes" /> Quoted posts</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <div class="chips">
+            <b>Hide:</b>
+            <label title="Promoted posts"><input type="checkbox" name="hidePromoted" /> Ads</label>
+            <label><input type="checkbox" name="hideWhoToFollow" /> Who to follow</label>
+            <label title="The &quot;What's happening&quot; / trends box"><input type="checkbox" name="hideTrends" /> Trends</label>
+            <label title="The &quot;Subscribe to Premium&quot; box"><input type="checkbox" name="hidePremium" /> Premium</label>
+            <label title="The &quot;Live on X&quot; box"><input type="checkbox" name="hideLive" /> Live</label>
+          </div>
+        </fieldset>
+
+        <p class="note">
+          <b>3/day</b> = average posts a day since joining. Replies and reposts count, so it's a
+          hint, not proof.
+        </p>
+      </section>
+
+      <section id="panel-creator" role="tabpanel" aria-labelledby="tab-creator" hidden>
+        <label class="row" title="On a post's page, checks the replies under it">
+          <span>Reply Filter<small>Low-effort and bot replies on post pages</small></span>
+          <input type="checkbox" name="replyFilter" />
+        </label>
+
+        <label class="row">
+          <span>Filtered replies</span>
+          <select name="replyFilterMode">
+            <option value="badge">Badge only</option>
+            <option value="collapse">Collapse</option>
+            <option value="hide">Hide completely</option>
+          </select>
+        </label>
+
+        <div class="row slider">
+          <span>Sensitivity</span>
+          <span class="range">
+            <input type="range" name="replyFilterSensitivity" min="0" max="2" step="1" data-values="lenient,balanced,strict" aria-valuetext="balanced" />
+            <span class="ticks" aria-hidden="true"><i>Lenient</i><i>Balanced</i><i>Strict</i></span>
+          </span>
         </div>
-      </fieldset>
 
-      <fieldset>
-        <div class="chips">
-          <b>Hide:</b>
-          <label title="Promoted posts"><input type="checkbox" name="hidePromoted" /> Ads</label>
-          <label><input type="checkbox" name="hideWhoToFollow" /> Who to follow</label>
-          <label title="The &quot;What's happening&quot; / trends box"><input type="checkbox" name="hideTrends" /> Trends</label>
-          <label title="The &quot;Subscribe to Premium&quot; box"><input type="checkbox" name="hidePremium" /> Premium</label>
-          <label title="The &quot;Live on X&quot; box"><input type="checkbox" name="hideLive" /> Live</label>
-        </div>
-      </fieldset>
+        <label class="stack">
+          <span>Never filter<small>Handles, separated by commas or lines</small></span>
+          <textarea name="replyFilterAllow" rows="2" placeholder="@friend, @teammate" spellcheck="false"></textarea>
+        </label>
+
+        <label class="stack">
+          <span>Muted keywords<small>Replies containing these are always filtered</small></span>
+          <textarea name="replyFilterMuted" rows="2" placeholder="giveaway, 🚀" spellcheck="false"></textarea>
+        </label>
+
+        <p class="note">
+          Bot Meter's posts-a-day score plus simple checks: stock replies ("great post", 🔥🔥), copy-pasted
+          text, Telegram and crypto promotion, "follow back". The post's own author and people you follow are
+          never filtered. Everything runs on your device.
+        </p>
+      </section>
     </form>
-
-    <p class="note">
-      <b>3/day</b> = average posts a day since joining. Replies and reposts count, so it's a
-      hint, not proof.
-    </p>
 
     <footer>
       <a href="https://x.com/buildwithSud" target="_blank" rel="noopener">@buildwithSud</a>

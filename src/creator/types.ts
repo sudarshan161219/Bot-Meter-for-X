@@ -61,6 +61,8 @@ export interface Author {
   createdAt: number | null;
   verified: boolean;
   bio: string | null;
+  /** Whether the signed-in viewer follows this account; only set when X sent it. */
+  followedByViewer?: boolean;
 }
 
 export interface Capture {
