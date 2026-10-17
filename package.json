@@ -9,7 +9,8 @@
     "build:creator": "node scripts/build-creator.mjs",
     "build": "npm run build:creator && rm -rf dist && mkdir -p dist && zip -r -X dist/bot-meter-x-$(node -p \"require('./manifest.json').version\").zip manifest.json icons src -x \"src/creator/*\"",
     "store:images": "bash store/render.sh",
-    "build:tools": "npm run build:creator && mkdir -p dist && cd creator-tools && zip -r -X ../dist/creator-tools-x-$(node -p \"require('./manifest.json').version\").zip manifest.json content.css print.html print.css bookmarks.html bookmarks.css popup.html popup.css icons gen"
+    "build:tools": "npm run build:creator && mkdir -p dist && cd creator-tools && zip -r -X ../dist/creator-tools-x-$(node -p \"require('./manifest.json').version\").zip manifest.json content.css print.html print.css bookmarks.html bookmarks.css popup.html popup.css icons gen",
+    "store:icons": "bash store/render-icons.sh"
   },
   "devDependencies": {
     "@types/chrome": "0.3.5",

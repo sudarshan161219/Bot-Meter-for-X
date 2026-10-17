@@ -65,6 +65,7 @@ Made by @buildwithSud. If Bot Meter saves you from a few bots, you can buy me a 
 **Screenshots (1280×800):**
 1. `store/images/screenshot-1-feed.png`
 2. `store/images/screenshot-2-settings.png`
+3. `store/images/screenshot-3-replies.png` (Reply Filter)
 
 **Small promo tile (440×280):** `store/images/promo-small-440x280.png`
 

@@ -2,7 +2,8 @@
 
 Upload: `dist/creator-tools-x-<version>.zip` (build with `npm run build:tools`).
 Icon: `creator-tools/icons/icon128.png` (source: `store/creator-tools-icon.svg`; re-render with
-`npm run store:images`). Screenshots (1280×800) and a small promo tile (440×280) still need to be made.
+`npm run store:icons`). Screenshots and promo tile: `store/images/creator-tools/` (re-render with
+`npm run store:images`).
 
 ## Store listing tab
 
@@ -50,6 +51,15 @@ Not affiliated with or endorsed by X Corp. "X" and "Twitter" are trademarks of X
 
 Made by @buildwithSud.
 ```
+
+**Screenshots (1280×800):**
+1. `store/images/creator-tools/screenshot-1-thread.png` (export preview, carousel)
+2. `store/images/creator-tools/screenshot-2-bookmarks.png` (Bookmark Brain page)
+3. `store/images/creator-tools/screenshot-3-sync.png` (bookmarks on X with the Sync all bar)
+
+**Small promo tile (440×280):** `store/images/creator-tools/promo-small-440x280.png`
+
+**Store icon (128×128):** `creator-tools/icons/icon128.png`
 
 **Homepage URL:** https://sudarshan161219.github.io/Bot-Meter-for-X/
 **Support URL:** https://github.com/sudarshan161219/Bot-Meter-for-X/issues

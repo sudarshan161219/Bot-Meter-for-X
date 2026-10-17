@@ -150,7 +150,7 @@ export function startBookmarkBrain(deps: BookmarkDeps): BookmarkCapture {
     const style = document.createElement('style');
     style.textContent = `
       :host { all: initial; }
-      .bar { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 2147482000;
+      .bar { position: fixed; left: 0; right: 0; bottom: 20px; margin: 0 auto; width: max-content; z-index: 2147482000;
         display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 16px; border-radius: 999px;
         background: #0f1419; color: #fff; box-shadow: 0 4px 18px rgba(0,0,0,.3);
         font: 14px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: calc(100vw - 32px); }

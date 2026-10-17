@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Creator Tools screenshot frame: thread</title>
+    <!-- Shown inside ct-screenshot-thread.html: a mock X thread with the real Creator Tools content script. -->
+    <link rel="stylesheet" href="ct-mock-x.css" />
+    <link rel="stylesheet" href="../creator-tools/content.css" />
+    <script>
+      window.chrome = {
+        storage: {
+          sync: { get: (d, cb) => cb({ ...d }) },
+          local: { get: async () => ({}), set: async () => {} },
+          onChanged: { addListener() {} },
+        },
+        runtime: { sendMessage: async () => ({ ok: true, total: 0 }) },
+      };
+    </script>
+    <script src="../creator-tools/gen/content.js"></script>
+  </head>
+  <body>
+    <main id="m"><div class="title">Post</div></main>
+    <script>
+      const H = 'lena_builds';
+      const base = Date.now() - 3 * 3600e3;
+      const texts = [
+        'How we cut our CI build time from 41 minutes to 9 🧵\n\nNo new hardware. Just five boring changes, in order of impact.',
+        '1/ Cache dependencies by lockfile hash. Most of our time went to reinstalling the same 1,400 packages on every run. This alone saved 14 minutes.',
+        '2/ Split the test suite by timing data, not by file count. Our slowest 3% of tests took 40% of the time.',
+        '3/ Stop building Docker images you never deploy. Preview branches reuse the last image unless the Dockerfile changed.',
+        '4/ Run lint and typecheck in parallel with tests instead of before them.',
+        '5/ Kill flaky retries. Retrying failing tests three times hid real bugs and tripled the worst case.',
+        'Full write-up with configs: https://example.com/ci-speedups',
+      ];
+      const ids = texts.map((_, i) => String(1979100000000000000n + BigInt(i)));
+      const tweets = texts.map((text, i) => ({
+        id: ids[i], authorId: '11', authorHandle: H, authorName: 'Lena Park', authorAvatar: null, verified: true, text,
+        createdAt: base + i * 60000, media: [], conversationId: i ? null : ids[0],
+        metrics: { likes: 2400 - i * 200, reposts: 310, replies: 88, quotes: 12, views: 184000, bookmarks: 950 },
+        urls: [], source: 'graphql', ...(i ? { inReplyToId: ids[i - 1] } : {}),
+      }));
+      const bar = (id) => `<div class="bar"><div data-engagement-action="reply"><a href="/${H}/status/${id}">💬 88</a></div><div data-engagement-action="retweet"><button>🔁 310</button></div><div data-engagement-action="like"><button>♡ 2.4K</button></div><div><div><div data-engagement-action="bookmark"><button>🔖</button></div></div></div></div>`;
+      document.getElementById('m').insertAdjacentHTML('beforeend', tweets.slice(0, 3).map((t) => `
+        <article><div class="avatar a3"></div><div class="body">
+          <div class="head"><a href="/${H}">Lena Park</a> <a href="/${H}">@${H}</a> · <a href="/${H}/status/${t.id}">3h</a></div>
+          <div dir="auto">${t.text}</div>${bar(t.id)}</div></article>`).join(''));
+      history.replaceState({}, '', `/${H}/status/${ids[0]}`);
+      window.postMessage({ source: 'creator-tools-x', type: 'capture', tweets, authors: [], bookmarks: [] }, '*');
+      // Open the export preview on the carousel tab.
+      setTimeout(() => {
+        document.querySelector('.ctx-export')?.click();
+        setTimeout(() => {
+          const root = document.querySelector('[data-creator-tools="export"]')?.shadowRoot;
+          root?.querySelector('[data-format="carousel"]')?.click();
+          root?.querySelector('[data-theme="brand"]')?.click();
+        }, 300);
+      }, 500);
+    </script>
+  </body>
+</html>

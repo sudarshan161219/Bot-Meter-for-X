@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Store screenshot: Reply Filter</title>
+    <!-- Chrome Web Store screenshot (1280x800). Renders with the real content scripts,
+         including the Reply Filter (src/gen/creator-content.js). Regenerate: npm run store:images -->
+    <link rel="stylesheet" href="../src/content.css" />
+    <link rel="stylesheet" href="store.css" />
+    <script>
+      window.chrome = { storage: { sync: { get: (d, cb) => cb({ ...d }) }, onChanged: { addListener() {} } } };
+    </script>
+    <script src="../src/settings.js"></script>
+    <script src="../src/stats.js"></script>
+    <script src="../src/content.js"></script>
+    <script src="../src/gen/creator-content.js"></script>
+  </head>
+  <body>
+    <div class="shot">
+      <section class="pitch">
+        <img src="../icons/icon128.png" width="72" height="72" alt="" />
+        <h1>Cut through reply spam</h1>
+        <p>On any post's page, the Reply Filter flags low-effort replies and bots. Collapse or hide them if you like.</p>
+        <ul>
+          <li><span class="pill flag">low effort</span> "great post", 🔥🔥, "this"</li>
+          <li><span class="pill flag">copy-pasted</span> same text, many accounts</li>
+          <li><span class="pill flag">promotion</span> Telegram, airdrops, "DM me"</li>
+          <li><span class="pill flag strong">likely bot</span> hundreds of posts a day</li>
+        </ul>
+      </section>
+
+      <main class="feed thread" id="feed"></main>
+    </div>
+    <script>
+      const now = Date.now();
+      const idFor = (daysAgo) => String((BigInt(now - daysAgo * 864e5) - 1288834974657n) << 22n);
+      const FOCAL = '1979000000000000000';
+      const post = (a, handle, name, id, text) => `
+        <article><div class="avatar ${a}"></div><div class="body">
+          <div class="head"><span><a href="/${handle}">${name}</a></span><span><a href="/${handle}">@${handle}</a> · <a href="/${handle}/status/${id}">1h</a></span></div>
+          <div dir="auto">${text}</div></div></article>`;
+      document.getElementById('feed').innerHTML = `
+        <article class="focal">
+          <div class="who"><div class="avatar a3"></div><div class="head"><span><a href="/lena_builds">Lena Park</a></span><span><a href="/lena_builds">@lena_builds</a></span></div></div>
+          <div dir="auto">We just open-sourced the scheduler that runs our whole data platform. 3 years of work, 40k lines, MIT licensed. Ask me anything about it 👇</div>
+          <div class="when"><a href="/lena_builds/status/${FOCAL}">9:41 AM · Oct 16, 2026</a></div>
+        </article>
+        ${post('a1', 'maya_writes', 'Maya Chen', '1979000000000000001', 'How do you handle retries when a downstream job is still running? Lease, or a separate lock table?')}
+        ${post('a2', 'cryptoalpha_x9', 'ALPHA SIGNALS 🚀', '1979000000000000002', 'Amazing project 🔥🔥 Join our VIP group t.me/alphasignals for 100x gems!!')}
+        ${post('a6', 'growthguru22', 'Growth Guru', '1979000000000000003', 'Great post!')}
+        ${post('a7', 'devon_k', 'Devon Kim', '1979000000000000004', 'Congrats! We hit the same scaling wall at ~2k jobs a minute. Did you shard the queue?')}
+        ${post('a5', 'nft_drops_daily', 'Drops Daily', '1979000000000000005', 'This is huge for the community, sharing with my whole team right now')}
+        ${post('a8', 'airdrop_hunter7', 'Airdrop Hunter', '1979000000000000006', 'This is huge for the community, sharing with my whole team right now')}
+        ${post('a4', 'follow_back_x', 'Follow Back ✅', '1979000000000000007', "Let's connect! Follow back 🤝")}`;
+      // The Reply Filter runs on post pages (/<user>/status/<id>).
+      history.replaceState({}, '', `/lena_builds/status/${FOCAL}`);
+      const users = [
+        { screenName: 'lena_builds', restId: idFor(2900), statuses: 8100, followers: 18400, following: 610 },
+        { screenName: 'maya_writes', restId: idFor(3100), statuses: 6500, followers: 2140, following: 530 },
+        { screenName: 'cryptoalpha_x9', restId: idFor(240), statuses: 98900, followers: 180, following: 4990 },
+        { screenName: 'growthguru22', restId: idFor(400), statuses: 15200, followers: 950, following: 4200 },
+        { screenName: 'devon_k', restId: idFor(1800), statuses: 4300, followers: 1210, following: 480 },
+        { screenName: 'nft_drops_daily', restId: idFor(150), statuses: 61000, followers: 320, following: 3100 },
+        { screenName: 'airdrop_hunter7', restId: idFor(90), statuses: 9900, followers: 40, following: 2600 },
+        { screenName: 'follow_back_x', restId: idFor(60), statuses: 2100, followers: 120, following: 4800 },
+      ];
+      window.postMessage({ source: 'bot-meter-x', type: 'users', users }, '*');
+    </script>
+  </body>
+</html>

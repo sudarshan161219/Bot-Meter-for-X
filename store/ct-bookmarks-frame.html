@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Creator Tools screenshot frame: bookmarks on X</title>
+    <!-- Shown inside ct-screenshot-sync.html: a mock x.com/i/bookmarks page with the real Creator Tools content script. -->
+    <link rel="stylesheet" href="ct-mock-x.css" />
+    <script>
+      window.chrome = {
+        storage: { sync: { get: (d, cb) => cb({ ...d }) }, onChanged: { addListener() {} } },
+        runtime: { sendMessage: async () => ({ ok: true, total: 1284 }) },
+      };
+    </script>
+    <script src="../creator-tools/gen/content.js"></script>
+  </head>
+  <body>
+    <main id="m"><div class="title">Bookmarks</div></main>
+    <script>
+      const rows = [
+        ['a5', 'priya_ml', 'Priya Nair', 'Evals are the new unit tests. If you ship LLM features without a fixed eval set, every prompt change is a coin flip.'],
+        ['a6', 'ana_designs', 'Ana Ruiz', 'Typography tip: body text at 16–18px, line height around 1.5, and no more than 75 characters per line.'],
+        ['a3', 'lena_builds', 'Lena Park', 'We open-sourced the scheduler that runs our data platform. 3 years, 40k lines, MIT licensed.'],
+        ['a1', 'maya_writes', 'Maya Chen', 'Writing advice I wish I had at 20: finish the draft before you fix the draft. Momentum beats polish.'],
+        ['a4', 'devon_k', 'Devon Kim', 'Our startup hit $10k MRR this week. 14 months, two pivots, zero ads. Lessons from year one 🧵'],
+        ['a3', 'sam_ships', 'Sam Okafor', 'The best performance fix I made all year: delete the feature nobody used. Load time down 38%.'],
+        ['a5', 'priya_ml', 'Priya Nair', 'Small models + good retrieval beat big models + no retrieval on our internal docs QA.'],
+      ];
+      document.getElementById('m').insertAdjacentHTML('beforeend', rows.map(([a, h, name, text], i) => `
+        <article><div class="avatar ${a}"></div><div class="body">
+          <div class="head"><a href="/${h}">${name}</a> <a href="/${h}">@${h}</a> · <a href="/${h}/status/${1979200000000000000n + BigInt(i)}">${i + 2}d</a></div>
+          <div dir="auto">${text}</div></div></article>`).join(''));
+      history.replaceState({}, '', '/i/bookmarks');
+    </script>
+  </body>
+</html>
