@@ -9,6 +9,7 @@ import { readArticle } from '../capture/dom-fallback';
 import type { BotMeterCore } from '../core';
 import { allowed } from '../entitlements';
 import { fail, isDisabled } from '../log';
+import { pagePosts } from '../page';
 import type { CreatorSettings } from '../settings';
 import { isExempt, judgeReply, parseList, RepeatIndex, verdictLabel, type Verdict } from './rules';
 
@@ -114,19 +115,7 @@ export function startReplyFilter(
     }
     const convo = conversation;
 
-    // Top-level posts in page order, with their author link and ID.
-    const posts: { article: Element; link: Element; handle: string; id: string }[] = [];
-    for (const article of document.querySelectorAll('article')) {
-      if (article.parentElement?.closest('article')) continue; // a quoted post
-      for (const link of article.querySelectorAll('a[href^="/"]')) {
-        if (link.closest('article') !== article) continue;
-        const handle = core.authorHandle(link);
-        if (!handle) continue;
-        const id = core.postId(article, handle);
-        if (id) posts.push({ article, link, handle, id });
-        break;
-      }
-    }
+    const posts = pagePosts(core);
     const focalIndex = posts.findIndex((p) => p.id === focalId);
     const focal = posts[focalIndex];
     if (!focal) return null; // the post itself hasn't rendered yet

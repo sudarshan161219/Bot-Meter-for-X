@@ -78,6 +78,33 @@ function parseMedia(item: unknown): Media | null {
   };
 }
 
+const ENTITIES: Record<string, string> = { '&amp;': '&', '&lt;': '<', '&gt;': '>' };
+
+/**
+ * The text a reader sees: X's raw text starts with the @handles a reply is
+ * addressed to, ends with a t.co link to attached media, and shortens every link
+ * to t.co. Keep the visible range (in code points), restore real link URLs, drop
+ * media links, and decode X's HTML escapes.
+ */
+export function readableText(raw: string, range: unknown, links: unknown[], media: unknown[]): string {
+  let text = raw;
+  const [start, end] = arr(range).map(num);
+  if (typeof start === 'number' && typeof end === 'number' && start >= 0 && end >= start) {
+    const chars = Array.from(raw);
+    if (end <= chars.length) text = chars.slice(start, end).join('');
+  }
+  for (const link of links) {
+    const short = str(get(link, 'url'));
+    const full = str(get(link, 'expanded_url'));
+    if (short && full) text = text.split(short).join(full);
+  }
+  for (const item of media) {
+    const short = str(get(item, 'url'));
+    if (short) text = text.split(short).join('');
+  }
+  return text.replace(/&(?:amp|lt|gt);/g, (e) => ENTITIES[e] ?? e).trim();
+}
+
 export function parseTweet(node: Obj): Tweet | null {
   if (node.__typename !== 'Tweet') return null;
   const id = str(node.rest_id);
@@ -94,6 +121,16 @@ export function parseTweet(node: Obj): Tweet | null {
   const quotedId = unwrapTweet(node.quoted_tweet_results ?? node.quoted_status_result)?.rest_id;
   const mediaList = arr(node.media_entities2 ?? get(legacy, 'extended_entities', 'media') ?? get(legacy, 'entities', 'media'));
   const urlList = arr(node.url_entities ?? get(legacy, 'entities', 'urls'));
+  const note = get(node, 'note_tweet', 'note_tweet_results', 'result');
+  const noteText = str(get(note, 'text'));
+  const text = noteText
+    ? readableText(noteText, null, [...arr(get(note, 'entity_set', 'urls')), ...urlList], mediaList)
+    : readableText(
+        str(get(details, 'full_text')) ?? str(get(legacy, 'full_text')) ?? '',
+        get(details, 'display_text_range') ?? get(legacy, 'display_text_range'),
+        urlList,
+        mediaList
+      );
 
   const tweet: Tweet = {
     id,
@@ -102,11 +139,7 @@ export function parseTweet(node: Obj): Tweet | null {
     authorName: author.name,
     authorAvatar: author.avatar,
     verified: author.verified,
-    text:
-      str(get(node, 'note_tweet', 'note_tweet_results', 'result', 'text')) ??
-      str(get(details, 'full_text')) ??
-      str(get(legacy, 'full_text')) ??
-      '',
+    text,
     createdAt: num(get(details, 'created_at_ms')) ?? parseDate(str(get(legacy, 'created_at'))) ?? snowflakeTime(id),
     media: mediaList.map(parseMedia).filter((m): m is Media => m !== null),
     conversationId: str(get(legacy, 'conversation_id_str')) ?? (inReplyToId ? null : id),

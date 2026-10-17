@@ -72,6 +72,24 @@ Nothing is stored or sent anywhere. Only your settings are saved, in `chrome.sto
   names). This version targets that client. If X changes it again, the field names in
   `src/inject.js` and the `@handle` link matching in `src/content.js` are what to update.
 
+## Creator Tools for X (separate extension)
+
+`creator-tools/` is a second extension built from the same code. It's separate because the
+Chrome Web Store asks each extension to have a single purpose. It reads only the posts X's page
+has already loaded, makes no requests of its own, and needs only the `storage` permission.
+
+- **Thread Exporter:** on a post page that's part of a thread (the author replying to
+  themselves), an **Export** button on the first post's action bar opens a preview:
+  - **Markdown:** frontmatter (title, author, date, source), one paragraph per post, images as
+    links, quoted posts as blockquotes.
+  - **Image carousel:** 1080×1350 PNG slides in a .zip, posts fitted to slides by length,
+    light, dark or brand-color themes.
+  - **PDF:** a clean reading layout in a new tab with the print dialog; choose "Save as PDF".
+  - **Copy text:** the unrolled thread, numbered, to the clipboard.
+
+To try it: `npm run build:creator`, then **Load unpacked** and pick the `creator-tools/` folder.
+`npm run build:tools` makes the store zip in `dist/`.
+
 ## Development
 
 Bot Meter's core (`src/*.js`) is plain JavaScript with no build step. Creator Tools live in
@@ -81,6 +99,10 @@ Bot Meter's core (`src/*.js`) is plain JavaScript with no build step. Creator To
   turns every response `inject.js` sees into normalized posts (`src/creator/types.ts`).
 - `src/gen/creator-content.js` runs after `content.js`, keeps the shared post cache, and reuses the
   core's page scan and helpers through `globalThis.BotMeterCore`.
+- `creator-tools/gen/` holds the Creator Tools extension's bundles: its own page hook
+  (`src/creator/capture/hook.ts`, a typed copy of `inject.js`'s), content script, service worker
+  and print page. Thread assembly, the export formats, slide layout and the zip writer in
+  `src/creator/thread-exporter/` are pure and unit-tested.
 - The Reply Filter's heuristics are pure functions in `src/creator/reply-filter/rules.ts`; its
   settings sit with the core's in `src/settings.js`, and paid-feature checks in
   `src/creator/entitlements.ts`.

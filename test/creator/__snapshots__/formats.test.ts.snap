@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Markdown export > matches the snapshot 1`] = `
+"---
+title: "How we cut build times in half 🧵"
+author: "Maya Chen (@maya_writes)"
+date: 2026-09-25
+source: https://x.com/maya_writes/status/100
+posts: 3
+---
+
+How we cut build times in half 🧵
+
+A short thread.
+
+\\# not a heading
+1\\. not a list
+See https://example.com/a_b_c &lt;b>bold&lt;/b>
+
+![A chart](https://pbs.twimg.com/media/x.jpg)
+
+Inspired by this:
+
+[Video](https://video.twimg.com/v.mp4)
+
+> **Acme** (@acme):
+> Original announcement
+> https://x.com/acme/status/900
+"
+`;
+
+exports[`plain text export > numbers posts and ends with the author and source link 1`] = `
+"1/3 How we cut build times in half 🧵
+
+A short thread.
+
+2/3 # not a heading
+1. not a list
+See https://example.com/a_b_c <b>bold</b>
+[photo: https://pbs.twimg.com/media/x.jpg]
+
+3/3 Inspired by this:
+[video: https://video.twimg.com/v.mp4]
+> @acme: Original announcement
+
+— Maya Chen (@maya_writes), 2026-09-25
+https://x.com/maya_writes/status/100
+"
+`;

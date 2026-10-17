@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseAuthor, parseGraphQL } from '../../src/creator/capture/parse-graphql';
+import { parseAuthor, parseGraphQL, readableText } from '../../src/creator/capture/parse-graphql';
 import { replayPage } from './replay';
 
 const NASA_POST = '2103610284464316469';
@@ -18,7 +18,9 @@ describe('parseGraphQL on real x.com pages (2026 client)', () => {
       source: 'graphql',
       createdAt: 1790374749000,
     });
+    // Readable text: real link URL instead of t.co, no trailing media link.
     expect(post?.text).toMatch(/^With @BoeingSpace, we’ll provide an update on Starliner/);
+    expect(post?.text).toMatch(/Watch live Monday, Sept\. 28 at 3pm ET: https:\/\/go\.nasa\.gov\/4AA9Ii5$/);
     expect(post?.metrics).toMatchObject({ likes: 4229, reposts: 549, replies: 199, quotes: 60, bookmarks: 158 });
     expect(post?.metrics.views).toBeGreaterThan(0);
     expect(post?.media[0]).toMatchObject({ type: 'photo', url: 'https://pbs.twimg.com/media/HTGGPVlWUAAeapm.jpg' });
@@ -38,6 +40,7 @@ describe('parseGraphQL on real x.com pages (2026 client)', () => {
     for (const reply of replies) {
       expect(reply.conversationId).toBeNull();
       expect(reply.text.length).toBeGreaterThan(0);
+      expect(reply.text).not.toMatch(/^@NASA/); // the @handles a reply is addressed to aren't part of its text
       expect(reply.createdAt).toBeGreaterThan(Date.parse('2026-01-01'));
     }
   });
@@ -169,5 +172,17 @@ describe('parseAuthor', () => {
     expect(parseAuthor({ ...user, relationship_perspectives: { following: true } })?.followedByViewer).toBe(true);
     expect(parseAuthor({ ...user, legacy: { following: false } })?.followedByViewer).toBe(false);
     expect(parseAuthor(user)).not.toHaveProperty('followedByViewer'); // signed out: unknown
+  });
+});
+
+describe('readableText', () => {
+  it('keeps the visible range by code point, restores links, drops media links and decodes escapes', () => {
+    const raw = '@op 🚀 Q&amp;A at https://t.co/abc &lt;3 https://t.co/media';
+    const links = [{ url: 'https://t.co/abc', expanded_url: 'https://example.com/qa' }];
+    const media = [{ url: 'https://t.co/media' }];
+    // [4, 39): after "@op ", up to the media link; the emoji counts as one code point.
+    expect(readableText(raw, [4, 39], links, media)).toBe('🚀 Q&A at https://example.com/qa <3');
+    expect(readableText(raw, null, links, media)).toBe('@op 🚀 Q&A at https://example.com/qa <3');
+    expect(readableText('short', [0, 99], [], [])).toBe('short'); // bad range: whole text
   });
 });

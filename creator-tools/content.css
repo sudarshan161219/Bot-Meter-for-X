@@ -1,0 +1,19 @@
+/* Export button in a thread's action bar, styled like X's own icon buttons. */
+.ctx-export {
+  align-self: center;
+  margin-left: 4px;
+  padding: 3px 12px;
+  border: 1px solid rgba(113, 118, 123, 0.5);
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(113, 118, 123);
+  font: 600 13px/18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ctx-export:hover {
+  color: #1d9bf0;
+  border-color: #1d9bf0;
+  background: rgba(29, 155, 240, 0.1);
+}
