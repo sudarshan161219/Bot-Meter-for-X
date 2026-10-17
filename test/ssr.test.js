@@ -7,8 +7,10 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'inject.js'), 'utf8');
+// Built by `npm run build:creator` (npm test runs it first).
+const creatorMain = path.join(__dirname, '..', 'src', 'gen', 'creator-main.js');
 
-async function replay(page) {
+async function replay(page, { withCreator = false } = {}) {
   const html = fs.readFileSync(path.join(__dirname, 'pages', page), 'utf8');
   const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
   const posted = [];
@@ -31,6 +33,7 @@ async function replay(page) {
   };
   ctx.window = ctx.self = ctx.globalThis = ctx;
   vm.createContext(ctx);
+  if (withCreator) vm.runInContext(fs.readFileSync(creatorMain, 'utf8'), ctx);
   vm.runInContext(src, ctx);
   let ran = 0;
   for (const code of scripts) {
@@ -46,7 +49,8 @@ async function replay(page) {
     for (const u of m.users) users[u.screenName] = u;
     for (const p of m.posts) posts[p.id] = p;
   }
-  return { users, posts, ran };
+  const tweets = posted.flatMap((m) => m.tweets ?? []);
+  return { users, posts, tweets, ran };
 }
 
 test('profile page: reads the profile owner from the SSR stream', async () => {
@@ -74,4 +78,21 @@ test('post page: reads the author and repliers', async () => {
     // Post authors have no join date in x-web; the account ID stands in for it.
     assert.match(users[name].restId, /^\d+$/);
   }
+});
+
+test('with the Creator parser loaded, the same messages carry normalized posts', async () => {
+  const { tweets, users } = await replay('status-NASA.html', { withCreator: true });
+  const post = tweets.find((t) => t.id === '2103610284464316469');
+  assert.ok(post, 'NASA post missing from tweets');
+  assert.strictEqual(post.authorHandle, 'NASA');
+  assert.strictEqual(post.metrics.likes, 4229);
+  assert.strictEqual(tweets.filter((t) => t.inReplyToId === post.id).length, 3);
+  // Bot Meter's own data is unchanged.
+  assert.strictEqual(users.NASA.statuses, 74336);
+});
+
+test('without the Creator parser, messages carry no posts (core works alone)', async () => {
+  const { tweets, users } = await replay('status-NASA.html');
+  assert.strictEqual(tweets.length, 0);
+  assert.ok(users.NASA);
 });

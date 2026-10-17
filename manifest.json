@@ -28,6 +28,7 @@
         "https://x.com/*"
       ],
       "js": [
+        "src/gen/creator-main.js",
         "src/inject.js"
       ],
       "run_at": "document_start",
@@ -40,7 +41,8 @@
       "js": [
         "src/settings.js",
         "src/stats.js",
-        "src/content.js"
+        "src/content.js",
+        "src/gen/creator-content.js"
       ],
       "css": [
         "src/content.css"

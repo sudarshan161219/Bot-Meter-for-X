@@ -239,11 +239,34 @@
     return { users: [...found.values()], posts, promoted, modules, about };
   }
 
+  // Creator Tools' parser (src/gen/creator-main.js, loaded just before this file)
+  // turns the same responses into normalized posts. It's optional and isolated:
+  // after a few errors it's skipped for the rest of the page, so Bot Meter's own
+  // scoring never depends on it.
+  const CREATOR_PARSE = Symbol.for('botmeter.creator.parse');
+  let creatorErrors = 0;
+  function creatorParse(data) {
+    const parse = window[CREATOR_PARSE];
+    if (typeof parse !== 'function' || creatorErrors >= 5) return null;
+    try {
+      return parse(data);
+    } catch (error) {
+      if (++creatorErrors === 5) console.warn('[BotMeter:Creator] capture disabled after repeated parse errors', error);
+      return null;
+    }
+  }
+
   function publish(data) {
     try {
       const { users, posts, promoted, modules, about } = collect(data);
-      if (users.length || posts.length || promoted.length || modules.length || about.length) {
-        window.postMessage({ source: SOURCE, type: 'users', users, posts, promoted, modules, about }, window.location.origin);
+      const creator = creatorParse(data);
+      const tweets = creator?.tweets ?? [];
+      const authors = creator?.authors ?? [];
+      if (users.length || posts.length || promoted.length || modules.length || about.length || tweets.length) {
+        window.postMessage(
+          { source: SOURCE, type: 'users', users, posts, promoted, modules, about, tweets, authors },
+          window.location.origin
+        );
       }
     } catch {
       // Never let our parsing break the page.
@@ -270,15 +293,28 @@
       },
     };
     const R = window.$R && typeof window.$R === 'object' ? window.$R : (window.$R = {});
-    let tsr = R.tsr && typeof R.tsr === 'object' ? new Proxy(R.tsr, handler) : R.tsr;
-    Object.defineProperty(R, 'tsr', {
-      configurable: true,
-      enumerable: true,
-      get: () => tsr,
-      set: (v) => {
-        tsr = v && typeof v === 'object' ? new Proxy(v, handler) : v;
-      },
-    });
+    // Another copy of this script (e.g. the Creator Tools extension) may have
+    // trapped tsr already: chain onto its getter/setter so both keep working.
+    const prior = Object.getOwnPropertyDescriptor(R, 'tsr');
+    const wrap = (v) => (v && typeof v === 'object' ? new Proxy(v, handler) : v);
+    if (prior?.set && prior.get) {
+      Object.defineProperty(R, 'tsr', {
+        configurable: true,
+        enumerable: true,
+        get: prior.get,
+        set: (v) => prior.set(wrap(v)),
+      });
+    } else {
+      let tsr = wrap(R.tsr);
+      Object.defineProperty(R, 'tsr', {
+        configurable: true,
+        enumerable: true,
+        get: () => tsr,
+        set: (v) => {
+          tsr = wrap(v);
+        },
+      });
+    }
   } catch {}
 
   // --- 2. fetch ---

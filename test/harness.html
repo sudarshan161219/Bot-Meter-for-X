@@ -68,10 +68,13 @@
       };
     </script>
     <script src="fixtures.js"></script>
+    <!-- Same order as the manifest. src/gen/ is built by `npm run build:creator`. -->
+    <script src="../src/gen/creator-main.js"></script>
     <script src="../src/inject.js"></script>
     <script src="../src/settings.js"></script>
     <script src="../src/stats.js"></script>
     <script src="../src/content.js"></script>
+    <script src="../src/gen/creator-content.js"></script>
   </head>
   <body>
     <div class="wrap">
@@ -152,6 +155,11 @@
         <div class="head"><span><a href="/newsdesk">NEWSDESK</a></span> <span><a href="/newsdesk">@newsdesk</a> · <time>2m</time></span></div>
         <div dir="auto">We're live now:</div>
         <a class="more" href="/i/broadcasts/1abc">Watch the broadcast</a>
+      </article></div>
+      <!-- Only on the page (no data): the Creator page fallback should pick it up. -->
+      <div data-timeline-entry=""><article>
+        <div class="head"><span><a href="/page_only">Page Only</a></span> <span><a href="/page_only">@page_only</a> · <a href="/page_only/status/1890000000000000000"><time>1m</time></a></span></div>
+        <div dir="auto">This post never arrived as data.</div>
       </article></div>
       <!-- Ad: post 29's timeline entry has promoted_metadata. -->
       <div data-timeline-entry=""><article>

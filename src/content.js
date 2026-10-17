@@ -229,6 +229,13 @@
     }
 
     decorateProfile();
+    for (const fn of scanListeners) {
+      try {
+        fn();
+      } catch (error) {
+        console.warn('[BotMeter:Creator]', error);
+      }
+    }
   }
 
   // Ads: X's promoted_metadata, or (fallback, English UI) an "Ad"/"Promoted" label in the post.
@@ -560,6 +567,21 @@
     if (notice.title !== title) notice.title = title;
     notice.dataset.key = `${reason}:${who}`;
   }
+
+  // Small API for Creator Tools (src/gen/creator-content.js), which runs in this
+  // same content-script world: they reuse this page scan, these page helpers and
+  // the posts-per-day scorer instead of keeping copies.
+  const scanListeners = new Set();
+  globalThis.BotMeterCore = Object.freeze({
+    authorHandle,
+    postId,
+    lookup: (handle) => lookup(handle),
+    onScan(fn) {
+      scanListeners.add(fn);
+      scheduleScan();
+      return () => scanListeners.delete(fn);
+    },
+  });
 
   new MutationObserver(scheduleScan).observe(document.documentElement, {
     childList: true,

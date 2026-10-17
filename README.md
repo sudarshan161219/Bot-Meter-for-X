@@ -31,10 +31,11 @@ An account that has averaged 200 posts a day for years is very likely automated.
 
 From the Chrome Web Store (link coming once the listing is approved), or in developer mode:
 
-1. Open `chrome://extensions`
-2. Turn on **Developer mode** (top right)
-3. Click **Load unpacked** and select this folder
-4. Open or reload x.com
+1. Run `npm install` then `npm run build:creator` (builds `src/gen/`, which the manifest loads)
+2. Open `chrome://extensions`
+3. Turn on **Developer mode** (top right)
+4. Click **Load unpacked** and select this folder
+5. Open or reload x.com
 
 Works in Chrome, Brave and other Chromium browsers (Chrome 111+).
 
@@ -67,8 +68,18 @@ Nothing is stored or sent anywhere. Only your settings are saved, in `chrome.sto
 
 ## Development
 
+Bot Meter's core (`src/*.js`) is plain JavaScript with no build step. Creator Tools live in
+`src/creator/` (strict TypeScript), bundled by Vite into `src/gen/` (git-ignored):
+
+- `src/gen/creator-main.js` runs in the page just before `inject.js` and registers the parser that
+  turns every response `inject.js` sees into normalized posts (`src/creator/types.ts`).
+- `src/gen/creator-content.js` runs after `content.js`, keeps the shared post cache, and reuses the
+  core's page scan and helpers through `globalThis.BotMeterCore`.
+
 ```
-npm test                              # unit tests (Node 18+)
+npm run build:creator                 # build src/gen/ (needed before loading unpacked)
+npm run typecheck                     # strict TypeScript check of src/creator and its tests
+npm test                              # builds, then core tests (node:test) + Creator tests (Vitest)
 python3 -m http.server 8765           # then open http://127.0.0.1:8765/test/harness.html
 ```
 
