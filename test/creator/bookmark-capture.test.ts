@@ -38,6 +38,7 @@ beforeAll(() => {
     },
     count: async () => 40,
     openApp: () => {},
+    enabled: () => true,
   });
 });
 afterAll(() => {

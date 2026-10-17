@@ -38,6 +38,7 @@ FEATURES
 • Choose what gets checked: switch replies, reposts or quoted posts on or off
 • Adult content filter: label, blur or hide posts X flags as sensitive, plus optional matching of adult-spam words (NSFW, 18+, OnlyFans)
 • Declutter: hide promoted posts and the "Who to follow", "What's happening", "Subscribe to Premium" and "Live on X" boxes
+• Reply Filter: on a post's page, flag, collapse or hide low-effort replies ("great post", 🔥🔥, copy-pasted text, crypto promotion, "follow back") and likely bots, with a lenient/balanced/strict setting, a never-filter list and muted keywords
 • Works in reply threads, where bot replies pile up the most
 
 PRIVATE AND LIGHTWEIGHT
@@ -76,12 +77,12 @@ Made by @buildwithSud. If Bot Meter saves you from a few bots, you can buy me a 
 
 **Single purpose description:**
 ```
-Bot Meter filters unwanted accounts and posts out of the user's X (x.com) feed. It shows each account's average number of posts per day as a small badge next to its name so users can spot likely bots, and it can dim or hide posts from likely bots, posts that X flags as sensitive (adult) content, promoted posts, and sidebar boxes such as "Who to follow", "What's happening", "Subscribe to Premium" and "Live on X". All of this happens on x.com only, using data X has already loaded into the page.
+Bot Meter filters unwanted accounts and posts out of the user's X (x.com) feed. It shows each account's average number of posts per day as a small badge next to its name so users can spot likely bots, and it can dim or hide posts from likely bots, low-effort and spam replies, posts that X flags as sensitive (adult) content, promoted posts, and sidebar boxes such as "Who to follow", "What's happening", "Subscribe to Premium" and "Live on X". All of this happens on x.com only, using data X has already loaded into the page.
 ```
 
 **Permission justification: `storage`**
 ```
-Used only to save the user's own settings: whether the extension is on, the two posts-per-day thresholds ("high rate" and "likely bot"), whether to show a badge on every account, and what to do with posts from likely bots (label, dim or collapse). Settings are saved with chrome.storage.sync so they persist between sessions. No browsing history, account data or post content is stored.
+Used only to save the user's own settings: whether the extension is on, the two posts-per-day thresholds ("high rate" and "likely bot"), whether to show a badge on every account, what to do with posts from likely bots (label, dim or collapse), adult-content and declutter switches, and the Reply Filter's mode, sensitivity, never-filter handles and muted keywords. Settings are saved with chrome.storage.sync so they persist between sessions. No browsing history, account data or post content is stored.
 ```
 
 **Host permission justification** (content scripts on `https://x.com/*` only):
@@ -106,7 +107,7 @@ All JavaScript is packaged with the extension. Nothing is loaded from a server, 
 | Location | No | Never read |
 | Web history | No | Nothing about browsing is recorded |
 | User activity | No | No clicks, keystrokes or scrolling are tracked |
-| Website content | No | Post counts, account IDs, X's sensitive-content flags and (optionally) post text are read on the page but processed only in the browser; nothing is stored or transmitted |
+| Website content | No | Post counts, account IDs, X's sensitive-content flags and post text (for the adult-word and Reply Filter checks) are read on the page but processed only in the browser; nothing is stored or transmitted |
 
 Then tick all three certifications:
 - I do not sell or transfer user data to third parties, outside of the approved use cases

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Creator Tools Privacy Policy</title>
+    <meta name="description" content="Privacy policy for the Creator Tools for X browser extension. It sends nothing anywhere; saved bookmarks stay on your device." />
+    <link rel="icon" href="assets/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="./"><img src="assets/creator-tools-icon128.png" alt="" />Creator Tools for X</a>
+        <nav aria-label="Site">
+          <a href="./">Home</a>
+        </nav>
+      </header>
+
+      <main class="doc">
+        <h1>Privacy policy</h1>
+        <p class="updated">Effective October 17, 2026</p>
+
+        <div class="summary-box">
+          <p>
+            <strong>In short:</strong> Creator Tools for X sends nothing anywhere and has no server. Bookmarks you
+            save with Bookmark Brain stay in your browser on this device until you delete them.
+          </p>
+        </div>
+
+        <h2>Who this covers</h2>
+        <p>
+          This policy covers the Creator Tools for X browser extension ("Creator Tools", "the extension"), made by
+          Sudarshan (<a href="https://x.com/buildwithSud">@buildwithSud</a>), as published on the Chrome Web Store
+          and in its public source repository. Bot Meter for X has <a href="privacy.html">its own policy</a>.
+        </p>
+
+        <h2>What the extension reads</h2>
+        <p>
+          The extension runs only on <code>x.com</code>. There it reads what X has already loaded into the page
+          you're viewing:
+        </p>
+        <ul>
+          <li>posts: their text, links, photo and video addresses, counts (likes, reposts, replies, views) and dates</li>
+          <li>their authors: display name, handle and profile picture address</li>
+        </ul>
+        <p>
+          It uses these to build thread exports (Markdown, image carousel, PDF, plain text) and, while you're on
+          <code>x.com/i/bookmarks</code>, to save your bookmarks. It makes no requests to X's API and does not read
+          your direct messages, your password, your X login session, or any page outside x.com.
+        </p>
+
+        <h2>What the extension stores</h2>
+        <p>Everything below stays on this device:</p>
+        <ul>
+          <li>
+            <strong>Bookmark Brain:</strong> the bookmarked posts that loaded while you were on your bookmarks page
+            (text, author, date, counts, link and media addresses), plus the tags, notes and tag rules you add. They
+            live in the extension's own database (IndexedDB) in your browser profile, are not synced between devices,
+            and are never sent anywhere. Delete them any time with "Delete all data" on the Bookmark Brain page, or by
+            removing the extension.
+          </li>
+          <li>
+            <strong>Settings:</strong> the Thread Exporter and Bookmark Brain switches, saved with Chrome's
+            <code>storage.sync</code> so they follow your Chrome profile, and your last export format and theme, saved
+            on this device.
+          </li>
+          <li>
+            <strong>PDF view:</strong> when you export a thread as PDF, its posts are held in Chrome's in-memory session
+            storage just long enough for the print view to open, then removed.
+          </li>
+        </ul>
+
+        <h2>What the extension sends</h2>
+        <p>
+          Nothing. Creator Tools has no server and includes no analytics, advertising, tracking or crash-reporting
+          code. Exports are files you download or text you copy; where they go is up to you.
+        </p>
+        <p>
+          To show pictures, the Bookmark Brain page, the PDF view and the carousel header load images from X's image
+          server (<code>pbs.twimg.com</code>), the same way x.com does. No information about you is added to those
+          requests, and nothing is sent anywhere else.
+        </p>
+
+        <h2>Permissions</h2>
+        <div class="table-box">
+          <table class="perm">
+            <thead>
+              <tr><th scope="col">Permission</th><th scope="col">Why it's needed</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>storage</code></td><td>Saves your settings and export preferences, and briefly holds a thread while the PDF view opens.</td></tr>
+              <tr><td>Runs on <code>https://x.com/*</code></td><td>Reads posts already on the page to add the Export button to threads and to save bookmarks on your bookmarks page. It runs on no other site.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Sharing and selling data</h2>
+        <p>
+          Nothing is collected by or sent to the developer or anyone else, so there is nothing to share or sell. No data
+          is transferred to third parties, used for advertising, or used to determine creditworthiness.
+        </p>
+
+        <h2>Children</h2>
+        <p>Creator Tools does not knowingly collect information from anyone, including children under 13.</p>
+
+        <h2>Changes to this policy</h2>
+        <p>
+          If a future version ever changes how data is handled, this page will be updated first, with a new effective
+          date, and the change will be described in the extension's release notes.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          Questions about this policy: message <a href="https://x.com/buildwithSud">@buildwithSud</a> on X, or open an
+          issue on <a href="https://github.com/sudarshan161219/Bot-Meter-for-X/issues">GitHub</a>.
+        </p>
+      </main>
+
+      <footer class="foot">
+        <span>Creator Tools for X is not affiliated with or endorsed by X Corp.</span>
+        <nav aria-label="Footer">
+          <a href="./">Home</a>
+          <a href="https://github.com/sudarshan161219/Bot-Meter-for-X">Source on GitHub</a>
+          <a href="https://buymeacoffee.com/sudarshanhosalli">Buy me a coffee</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -10,8 +10,11 @@ import { startThreadExporter } from '../thread-exporter';
 import type { Tweet } from '../types';
 import { arr, isObj, num, str } from '../util';
 import { PAGE_SOURCE, type OpenPrintMessage, type SaveBookmarksMessage } from './protocol';
+import { type ToolsSettings, watchToolsSettings } from './settings';
 
 const cache = new TweetCache();
+// Features stay off until the reader's settings have loaded.
+let settings: ToolsSettings | null = null;
 
 /** Sends a message to the service worker; null if it fails (e.g. the extension was just updated). */
 async function ask(message: object): Promise<Record<string, unknown> | null> {
@@ -56,6 +59,11 @@ const schedule = onPageChange(() => {
   for (const fn of listeners) fn();
 });
 
+watchToolsSettings((next) => {
+  settings = next;
+  schedule();
+});
+
 const onPageChangeHook = (fn: () => void): void => {
   listeners.add(fn);
   schedule();
@@ -69,6 +77,7 @@ startThreadExporter({
     const message: OpenPrintMessage = { type: 'open-print', tweets, quoted };
     return (await ask(message)) !== null;
   },
+  enabled: () => settings?.threadExporter === true,
 });
 
 const bookmarks = startBookmarkBrain({
@@ -85,6 +94,7 @@ const bookmarks = startBookmarkBrain({
   openApp() {
     void ask({ type: 'open-bookmarks' });
   },
+  enabled: () => settings?.bookmarkBrain === true,
 });
 
 // For manual checks in DevTools (pick the "Creator Tools for X" console context).

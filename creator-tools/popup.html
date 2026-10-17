@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Creator Tools for X</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="icons/icon32.png" alt="" width="24" height="24" />
+      <h1>Creator Tools for X</h1>
+    </header>
+
+    <form id="form">
+      <label class="row">
+        <span>Thread Exporter<small>Export button on threads: Markdown, carousel, PDF, text</small></span>
+        <input type="checkbox" name="threadExporter" />
+      </label>
+      <label class="row">
+        <span>Bookmark Brain<small>Saves bookmarks while you browse x.com/i/bookmarks</small></span>
+        <input type="checkbox" name="bookmarkBrain" />
+      </label>
+    </form>
+
+    <button type="button" id="open-bookmarks" class="primary">Open Bookmark Brain</button>
+    <p id="count" class="note center"></p>
+
+    <section id="pro" class="pro" hidden>
+      <h2>Creator Tools Pro</h2>
+      <ul id="pro-list"></ul>
+    </section>
+
+    <p class="note">
+      Reads only what X has already loaded in your browser. Nothing is sent anywhere; bookmarks are
+      saved on this device only.
+    </p>
+
+    <footer>
+      <a href="https://x.com/buildwithSud" target="_blank" rel="noopener">@buildwithSud</a>
+      <span aria-hidden="true">·</span>
+      <a href="https://buymeacoffee.com/sudarshanhosalli" target="_blank" rel="noopener">Buy me a coffee ☕</a>
+    </footer>
+
+    <script src="gen/popup.js"></script>
+  </body>
+</html>

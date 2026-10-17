@@ -62,8 +62,3 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
   });
   return true; // responds asynchronously
 });
-
-// The toolbar button opens Bookmark Brain.
-chrome.action.onClicked.addListener((tab) => {
-  void openPage('bookmarks.html', tab);
-});

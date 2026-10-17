@@ -89,8 +89,8 @@ has already loaded, makes no requests of its own, and needs only the `storage` p
 - **Bookmark Brain:** while you browse `x.com/i/bookmarks`, every bookmark that loads is saved
   to the extension's own IndexedDB (never x.com's storage, never a server). A small bar on that
   page shows the count and offers **Sync all**, which scrolls slowly (every 1.5–3 s, randomized)
-  until nothing new loads three times in a row; you can stop it at any time. Click the toolbar
-  icon to open the Bookmark Brain page:
+  until nothing new loads three times in a row; you can stop it at any time. Open the Bookmark
+  Brain page from that bar or the toolbar popup:
   - Instant search across text, authors, links, tags and notes (MiniSearch).
   - Filters: author, posted date range, has media, has links, minimum likes; sort by date
     bookmarked, date posted, engagement or best match.
@@ -101,8 +101,15 @@ has already loaded, makes no requests of its own, and needs only the `storage` p
   X doesn't say when you bookmarked something, only lists bookmarks newest first, so "date
   bookmarked" is that order as Bookmark Brain saw it.
 
+The toolbar popup has an on/off switch for each feature (both on by default: installing the
+extension is the opt-in) and a shortcut to Bookmark Brain. Paid features (carousel themes beyond
+light, Bookmark Brain tags/notes/export, the Reply Filter's "Hide completely") are all checked in
+`src/creator/entitlements.ts`; there are no payments yet, so everything is unlocked.
+
 To try it: `npm run build:creator`, then **Load unpacked** and pick the `creator-tools/` folder.
-`npm run build:tools` makes the store zip in `dist/`.
+`npm run build:tools` makes the store zip in `dist/`. Store copy and privacy answers are in
+`store/CREATOR-TOOLS-LISTING.md`; the privacy policy is `creator-tools/PRIVACY.md`, also on the
+website as `creator-tools-privacy.html`.
 
 ## Development
 
@@ -135,7 +142,8 @@ python3 -m http.server 8765           # then open http://127.0.0.1:8765/test/har
 scripts through `inject.js`. `test/anchors.json` is the ID → join-date data behind the estimates.
 
 `test/harness.html` loads the real extension scripts against a mock X page, so you can check the
-badge, dim and collapse behavior without logging in to X.
+badge, dim and collapse behavior without logging in to X. `TESTING.md` is the manual checklist
+for what only a real x.com session can show.
 
 ## Hosting the website
 

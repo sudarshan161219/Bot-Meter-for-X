@@ -21,6 +21,8 @@ export interface BookmarkDeps {
   save(items: CapturedBookmark[]): Promise<number | null>;
   count(): Promise<number | null>;
   openApp(): void;
+  /** The reader's on/off switch. */
+  enabled(): boolean;
 }
 
 export interface BookmarkCapture {
@@ -82,7 +84,7 @@ export function startBookmarkBrain(deps: BookmarkDeps): BookmarkCapture {
   function run(): void {
     if (isDisabled(FEATURE)) return;
     try {
-      if (!onBookmarksPage()) {
+      if (!onBookmarksPage() || !deps.enabled()) {
         if (visitStart) {
           visitStart = 0;
           if (syncing) syncing.stop = true;
@@ -116,7 +118,7 @@ export function startBookmarkBrain(deps: BookmarkDeps): BookmarkCapture {
     syncing = state;
     panel?.update();
     let idle = 0;
-    while (!state.stop && idle < SYNC_IDLE_STOPS && onBookmarksPage()) {
+    while (!state.stop && idle < SYNC_IDLE_STOPS && onBookmarksPage() && deps.enabled()) {
       const before = seen.size;
       window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
       // A randomized pause, like a person scrolling, so X has time to load more.
@@ -207,7 +209,7 @@ export function startBookmarkBrain(deps: BookmarkDeps): BookmarkCapture {
 
   return {
     fromResponse(ids) {
-      if (!onBookmarksPage() || isDisabled(FEATURE)) return;
+      if (!onBookmarksPage() || !deps.enabled() || isDisabled(FEATURE)) return;
       if (!visitStart) startVisit();
       for (const id of ids) add(deps.cache.tweets.peek(id));
     },

@@ -11,7 +11,7 @@
 //   src/creator/tools/background.ts   -> creator-tools/gen/background.js  (service worker)
 //   src/creator/tools/print.ts        -> creator-tools/gen/print.js       (print.html)
 //   src/creator/tools/bookmarks.ts    -> creator-tools/gen/bookmarks.js   (bookmarks.html, Bookmark Brain)
-import { cpSync } from 'node:fs';
+//   src/creator/tools/popup.ts        -> creator-tools/gen/popup.js       (popup.html, toolbar popup)
 import { build } from 'vite';
 
 const entries = [
@@ -22,6 +22,7 @@ const entries = [
   ['creator-tools/gen', 'background', 'src/creator/tools/background.ts'],
   ['creator-tools/gen', 'print', 'src/creator/tools/print.ts'],
   ['creator-tools/gen', 'bookmarks', 'src/creator/tools/bookmarks.ts'],
+  ['creator-tools/gen', 'popup', 'src/creator/tools/popup.ts'],
 ];
 
 for (const [outDir, name, entry] of entries) {
@@ -40,6 +41,3 @@ for (const [outDir, name, entry] of entries) {
   });
   console.log(`built ${outDir}/${name}.js`);
 }
-
-// Creator Tools uses Bot Meter's icons until it has its own.
-cpSync('icons', 'creator-tools/icons', { recursive: true });

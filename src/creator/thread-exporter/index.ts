@@ -17,11 +17,13 @@ export interface ExporterDeps {
   /** Called (debounced) on page changes. */
   onPageChange(fn: () => void): void;
   openPrint(tweets: Tweet[], quoted: Tweet[]): Promise<boolean>;
+  /** The reader's on/off switch. */
+  enabled(): boolean;
 }
 
 const focalId = (): string | null => location.pathname.match(/^\/[A-Za-z0-9_]{1,15}\/status\/(\d+)/)?.[1] ?? null;
 
-export function startThreadExporter({ cache, helpers, onPageChange, openPrint }: ExporterDeps): void {
+export function startThreadExporter({ cache, helpers, onPageChange, openPrint, enabled }: ExporterDeps): void {
   const currentThread = (): Thread | null => {
     const id = focalId();
     return id ? assembleThread(id, cache.tweets) : null;
@@ -41,7 +43,7 @@ export function startThreadExporter({ cache, helpers, onPageChange, openPrint }:
   function run(): void {
     if (isDisabled(FEATURE)) return;
     try {
-      const thread = currentThread();
+      const thread = enabled() ? currentThread() : null;
       let target: Element | null = null;
       if (isThread(thread)) {
         const posts = pagePosts(helpers);

@@ -22,7 +22,7 @@
 
       <main class="doc">
         <h1>Privacy policy</h1>
-        <p class="updated">Effective October 9, 2026</p>
+        <p class="updated">Effective October 17, 2026</p>
 
         <div class="summary-box">
           <p>
@@ -57,10 +57,15 @@
             if "Also match adult words" is on: the text of posts and authors' display names on the page,
             checked against a short built-in list of words (such as "NSFW" and "OnlyFans")
           </li>
+          <li>
+            if the Reply Filter is on: the text and links of the replies under a post you open, checked for
+            signs of low-effort replies (stock phrases, emoji only, copy-pasted text, promotion, "follow back")
+            and for keywords you muted
+          </li>
         </ul>
         <p>
-          It uses these only to calculate posts per day, draw a badge next to each account, and label, blur
-          or hide posts that look like adult content. All of this happens inside your browser; post text is
+          It uses these only to calculate posts per day, draw a badge next to each account, label, blur
+          or hide posts that look like adult content, and flag, collapse or hide low-effort replies. All of this happens inside your browser; post text is
           checked in place and never saved or sent anywhere. The extension does not read your direct messages, your password,
           your X login session, or any page outside x.com.
         </p>
@@ -81,6 +86,7 @@
           <li>which kinds of posts to check (replies, reposts, quoted posts)</li>
           <li>what to do with adult content (off, label, blur or hide), and whether to match adult words</li>
           <li>which of these to hide: promoted posts, "Who to follow", "What's happening", "Subscribe to Premium", "Live on X"</li>
+          <li>the Reply Filter's settings: on or off, badge/collapse/hide, sensitivity, your never-filter list of handles and your muted keywords</li>
         </ul>
         <p>
           If you're signed in to Chrome with sync turned on, Chrome syncs these settings across your
@@ -96,7 +102,7 @@
             </thead>
             <tbody>
               <tr><td><code>storage</code></td><td>Saves your settings, listed above.</td></tr>
-              <tr><td>Runs on <code>https://x.com/*</code></td><td>Reads post counts, sensitive-content flags and (optionally) post text already on the page, to show badges and filter adult content. It runs on no other site.</td></tr>
+              <tr><td>Runs on <code>https://x.com/*</code></td><td>Reads post counts, sensitive-content flags and post text already on the page, to show badges, filter adult content and flag low-effort replies. It runs on no other site.</td></tr>
             </tbody>
           </table>
         </div>
