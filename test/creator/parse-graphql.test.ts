@@ -186,3 +186,60 @@ describe('readableText', () => {
     expect(readableText('short', [0, 99], [], [])).toBe('short'); // bad range: whole text
   });
 });
+
+describe('posts X sends without a type label', () => {
+  it('reads a post wrapped in TweetWithVisibilityResults (e.g. limited replies), with its quote count', () => {
+    // The shape X sent for a real post that limits who can reply (trimmed).
+    const response = {
+      data: {
+        threaded_conversation_with_injections_v2: {
+          instructions: [
+            {
+              entries: [
+                {
+                  content: {
+                    itemContent: {
+                      __typename: 'TimelineTweet',
+                      tweet_results: {
+                        result: {
+                          __typename: 'TweetWithVisibilityResults',
+                          limitedActionResults: { limited_actions: [{ action: 'Reply' }] },
+                          tweet: {
+                            core: {
+                              user_results: {
+                                result: { __typename: 'User', rest_id: '2955928989', core: { screen_name: 'USAmbIndia', name: 'Ambassador Sergio Gor' } },
+                              },
+                            },
+                            legacy: {
+                              full_text: 'Welcome back to India! https://t.co/B9xH1XB93E',
+                              display_text_range: [0, 22],
+                              quote_count: 403,
+                              favorite_count: 6296,
+                              retweet_count: 280,
+                              reply_count: 0,
+                              created_at: 'Tue Oct 20 08:39:47 +0000 2026',
+                              conversation_id_str: '2112463781443916111',
+                            },
+                            rest_id: '2112463781443916111',
+                            views: { count: '559092' },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    };
+    const post = parseGraphQL(response).tweets.find((t) => t.id === '2112463781443916111');
+    expect(post).toMatchObject({ authorHandle: 'USAmbIndia', text: 'Welcome back to India!' });
+    expect(post?.metrics).toMatchObject({ quotes: 403, likes: 6296, reposts: 280, views: 559092 });
+  });
+
+  it('still ignores unlabelled objects that are not posts', () => {
+    expect(parseGraphQL({ rest_id: '1', legacy: { full_text: 'x' } }).tweets).toEqual([]);
+  });
+});

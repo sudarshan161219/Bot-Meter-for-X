@@ -24,6 +24,17 @@ unpacked extensions in `chrome://extensions`, and refresh x.com.
       and the post's own author are never flagged.
 - [ ] The home feed and profiles are unchanged; switching the Reply Filter off removes everything it added.
 
+## Quote count (Bot Meter → popup → Feed)
+
+- [ ] On a quoted post's page, a "View N quotes" pill ends the action bar; it opens the post's quotes list.
+- [ ] Without a count it reads "View quotes"; the Feed tab's switch removes it.
+
+## Popup (Bot Meter)
+
+- [ ] The three tabs (Bots, Replies, Feed) fit without scrolling, in light and dark mode.
+- [ ] Every switch, segmented button, slider and list saves and still applies after reopening the popup.
+- [ ] The header switch fades the settings and turns Bot Meter off on the page.
+
 ## Thread Exporter (Creator Tools)
 
 - [ ] On the first post of a thread (an author replying to themselves), an Export pill appears in the
@@ -40,7 +51,7 @@ unpacked extensions in `chrome://extensions`, and refresh x.com.
 
 ## Bookmark Brain (Creator Tools)
 
-- [ ] On x.com/i/bookmarks, the bottom bar shows the saved count, and it rises while scrolling.
+- [ ] On your bookmarks page (x.com/i/bookmarks, which X now redirects to x.com/i/history), the bottom bar shows the saved count, and it rises while scrolling.
 - [ ] Sync all scrolls every 1.5–3 s, shows progress, stops at the end of the list, and Stop works.
 - [ ] Open (or the popup's button) opens Bookmark Brain with the bookmarks newest first.
 - [ ] Search finds by text, author, link, tag and note; filters and sorts work together.

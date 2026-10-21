@@ -31,7 +31,11 @@ An account that has averaged 200 posts a day for years is very likely automated.
   (the default), collapse them behind "Show", or hide them, with a lenient/balanced/strict slider,
   a never-filter list and muted keywords. The post's own author and people you follow are never
   filtered. A line under the post counts them: "Filtered 23 of 140 replies".
-- Thresholds and behavior are configurable from the toolbar popup.
+- **Quote count:** X hides how often a post was quoted, and the link to its quotes, on some posts. On a post's
+  page Bot Meter adds a "View 60 quotes" link to the action bar that opens X's own list of quote posts,
+  where the badges show which quoting accounts look automated.
+- Everything is set in the toolbar popup: **Bots** (badges, thresholds, what to do with likely
+  bots), **Replies** (Reply Filter) and **Feed** (adult content, decluttering, quote count).
 
 ## Install
 
@@ -86,7 +90,8 @@ has already loaded, makes no requests of its own, and needs only the `storage` p
     light, dark or brand-color themes.
   - **PDF:** a clean reading layout in a new tab with the print dialog; choose "Save as PDF".
   - **Copy text:** the unrolled thread, numbered, to the clipboard.
-- **Bookmark Brain:** while you browse `x.com/i/bookmarks`, every bookmark that loads is saved
+- **Bookmark Brain:** while you browse your bookmarks on X (`x.com/i/bookmarks`, which X now
+  redirects to `x.com/i/history`), every bookmark that loads is saved
   to the extension's own IndexedDB (never x.com's storage, never a server). A small bar on that
   page shows the count and offers **Sync all**, which scrolls slowly (every 1.5–3 s, randomized)
   until nothing new loads three times in a row; you can stop it at any time. Open the Bookmark

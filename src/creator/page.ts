@@ -58,3 +58,18 @@ export function onPageChange(fn: () => void, delay = 150): () => void {
   schedule();
   return schedule;
 }
+
+/**
+ * A post's action bar (reply, repost, like, bookmark, share). X serves two
+ * versions of its web app: the new one (seen signed out) marks actions with
+ * data-engagement-action inside a plain row; the classic one (seen signed in)
+ * uses data-testid buttons inside a div[role="group"].
+ */
+export function actionBar(article: Element): Element | null {
+  const own = (el: Element): boolean => el.closest('article') === article;
+  const marked = [...article.querySelectorAll('[data-engagement-action="like"]')].find(own);
+  if (marked) return marked.parentElement;
+  const like = [...article.querySelectorAll('[data-testid="like"], [data-testid="unlike"]')].find(own);
+  const group = like?.closest('[role="group"]');
+  return group && own(group) ? group : null;
+}

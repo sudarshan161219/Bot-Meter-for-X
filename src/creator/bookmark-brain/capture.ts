@@ -8,10 +8,11 @@ import type { CoreHelpers } from '../core';
 import { fail, isDisabled } from '../log';
 import { pagePosts } from '../page';
 import type { Tweet } from '../types';
+import { isBookmarksPage } from './detect';
 import type { CapturedBookmark } from './model';
 
 const FEATURE = 'bookmark-brain';
-const onBookmarksPage = (): boolean => /^\/i\/bookmarks(\/|$)/.test(location.pathname);
+const onBookmarksPage = (): boolean => isBookmarksPage(location.pathname);
 
 export interface BookmarkDeps {
   cache: TweetCache;
@@ -44,6 +45,9 @@ export function startBookmarkBrain(deps: BookmarkDeps): BookmarkCapture {
   let total: number | null = null;
   let panel: Panel | null = null;
   let syncing: { stop: boolean } | null = null;
+  // The service worker didn't answer a save (e.g. the extension was reloaded
+  // without refreshing this tab): say so instead of showing a stale count.
+  let saveFailed = false;
 
   deps.onPageChange(run);
 
@@ -76,6 +80,7 @@ export function startBookmarkBrain(deps: BookmarkDeps): BookmarkCapture {
     if (pending.length) flushTimer = setTimeout(flush, 100);
     if (!batch.length) return;
     void deps.save(batch).then((n) => {
+      saveFailed = n === null;
       if (n !== null) total = n;
       panel?.update();
     });
@@ -181,7 +186,9 @@ export function startBookmarkBrain(deps: BookmarkDeps): BookmarkCapture {
       done: '',
       update() {
         const saved = total === null ? '' : `${total.toLocaleString('en-US')} saved`;
-        const label = syncing
+        const label = saveFailed
+          ? "Bookmark Brain couldn't save. Reload this page; if that doesn't help, reload the extension."
+          : syncing
           ? `Syncing… ${seen.size.toLocaleString('en-US')} loaded${saved ? ` · ${saved}` : ''}`
           : `Bookmark Brain${saved ? ` · ${saved}` : ''}${p.done ? ` · ${p.done}` : ''}`;
         if (text.textContent !== label) text.textContent = label;

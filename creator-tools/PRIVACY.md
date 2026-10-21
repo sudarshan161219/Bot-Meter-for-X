@@ -12,7 +12,7 @@ to save your bookmarks. It does not read your direct messages, your password or 
 session, and makes no requests to X's API.
 
 **What the extension stores, all on this device:**
-- **Bookmark Brain:** the bookmarked posts that loaded while you were on x.com/i/bookmarks (text,
+- **Bookmark Brain:** the bookmarked posts that loaded while you were on your bookmarks page on X (text,
   author, date, counts, link and media addresses), plus the tags, notes and tag rules you add. They
   are kept in the extension's own database (IndexedDB) in your browser profile. They are not synced
   between devices and are never sent anywhere. Delete them any time with "Delete all data" on the

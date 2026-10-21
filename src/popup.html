@@ -6,127 +6,129 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <header>
-      <img src="../icons/icon32.png" alt="" width="24" height="24" />
-      <h1>Bot Meter for X</h1>
-    </header>
-
-    <nav class="tabs" role="tablist">
-      <button type="button" role="tab" id="tab-core" aria-controls="panel-core" aria-selected="true">Bot Meter</button>
-      <button type="button" role="tab" id="tab-creator" aria-controls="panel-creator" aria-selected="false">Creator Tools</button>
-    </nav>
-
     <form id="form">
-      <section id="panel-core" role="tabpanel" aria-labelledby="tab-core">
-        <label class="row">
-          <span>Enabled</span>
-          <input type="checkbox" name="enabled" />
-        </label>
-
-        <label class="row" title="Off: only flag high-rate accounts">
-          <span>Badge on every account</span>
-          <input type="checkbox" name="showAll" />
-        </label>
-
-        <label class="row">
-          <span><i class="dot warn"></i>High rate at</span>
-          <span class="num"><input type="number" name="warnRate" min="1" step="1" /> /day</span>
-        </label>
-
-        <label class="row">
-          <span><i class="dot bot"></i>Likely bot at</span>
-          <span class="num"><input type="number" name="botRate" min="1" step="1" /> /day</span>
-        </label>
-
-        <label class="row">
-          <span>Posts from likely bots</span>
-          <select name="botAction">
-            <option value="label">Just label</option>
-            <option value="dim">Dim</option>
-            <option value="collapse">Collapse</option>
-          </select>
-        </label>
-
-        <label class="row" title="Uses X's own sensitive-content flags on posts, media and accounts">
-          <span>Adult (18+) content</span>
-          <select name="adultAction">
-            <option value="off">Off</option>
-            <option value="label">Label</option>
-            <option value="blur">Blur</option>
-            <option value="hide">Hide</option>
-          </select>
-        </label>
-
-        <label class="row" title="NSFW, 18+, OnlyFans, 🔞 in posts and display names">
-          <span>Also match adult words</span>
-          <input type="checkbox" name="adultWords" />
-        </label>
-
-        <fieldset>
-          <legend title="Off: no badge, never dimmed or collapsed as a bot">Check these posts for bots</legend>
-          <div class="chips">
-            <label><input type="checkbox" name="onReplies" /> Replies</label>
-            <label><input type="checkbox" name="onReposts" /> Reposts</label>
-            <label><input type="checkbox" name="onQuotes" /> Quoted posts</label>
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <div class="chips">
-            <b>Hide:</b>
-            <label title="Promoted posts"><input type="checkbox" name="hidePromoted" /> Ads</label>
-            <label><input type="checkbox" name="hideWhoToFollow" /> Who to follow</label>
-            <label title="The &quot;What's happening&quot; / trends box"><input type="checkbox" name="hideTrends" /> Trends</label>
-            <label title="The &quot;Subscribe to Premium&quot; box"><input type="checkbox" name="hidePremium" /> Premium</label>
-            <label title="The &quot;Live on X&quot; box"><input type="checkbox" name="hideLive" /> Live</label>
-          </div>
-        </fieldset>
-
-        <p class="note">
-          <b>3/day</b> = average posts a day since joining. Replies and reposts count, so it's a
-          hint, not proof.
-        </p>
-      </section>
-
-      <section id="panel-creator" role="tabpanel" aria-labelledby="tab-creator" hidden>
-        <label class="row" title="On a post's page, checks the replies under it">
-          <span>Reply Filter<small>Low-effort and bot replies on post pages</small></span>
-          <input type="checkbox" name="replyFilter" />
-        </label>
-
-        <label class="row">
-          <span>Filtered replies</span>
-          <select name="replyFilterMode">
-            <option value="badge">Badge only</option>
-            <option value="collapse">Collapse</option>
-            <option value="hide">Hide completely</option>
-          </select>
-        </label>
-
-        <div class="row slider">
-          <span>Sensitivity</span>
-          <span class="range">
-            <input type="range" name="replyFilterSensitivity" min="0" max="2" step="1" data-values="lenient,balanced,strict" aria-valuetext="balanced" />
-            <span class="ticks" aria-hidden="true"><i>Lenient</i><i>Balanced</i><i>Strict</i></span>
-          </span>
+      <header class="top">
+        <img src="../icons/icon32.png" alt="" width="28" height="28" />
+        <div class="brand">
+          <h1>Bot Meter</h1>
+          <p id="state" class="muted">On for x.com</p>
         </div>
-
-        <label class="stack">
-          <span>Never filter<small>Handles, separated by commas or lines</small></span>
-          <textarea name="replyFilterAllow" rows="1" placeholder="@friend, @teammate" spellcheck="false"></textarea>
+        <label class="switch" title="Turn Bot Meter on or off">
+          <input type="checkbox" name="enabled" role="switch" />
+          <span class="sr">Bot Meter on</span>
         </label>
+      </header>
 
-        <label class="stack">
-          <span>Muted keywords<small>Replies containing these are always filtered</small></span>
-          <textarea name="replyFilterMuted" rows="1" placeholder="giveaway, 🚀" spellcheck="false"></textarea>
-        </label>
+      <nav class="tabs" role="tablist" aria-label="Settings">
+        <button type="button" role="tab" id="tab-bots" aria-controls="panel-bots" aria-selected="true">Bots</button>
+        <button type="button" role="tab" id="tab-replies" aria-controls="panel-replies" aria-selected="false">Replies</button>
+        <button type="button" role="tab" id="tab-feed" aria-controls="panel-feed" aria-selected="false">Feed</button>
+      </nav>
 
-        <p class="note">
-          Uses Bot Meter's score plus checks for stock replies (🔥🔥), copy-pasted text, promotion and
-          "follow back". Never filters the post's author or people you follow. Runs on your device.
-        </p>
-        <p class="note">Thread Exporter and Bookmark Brain are in the companion extension, Creator Tools for X.</p>
-      </section>
+      <div class="panels">
+        <section id="panel-bots" role="tabpanel" aria-labelledby="tab-bots">
+          <h2>Badges</h2>
+          <div class="card">
+            <label class="row" title="Off: only high-rate accounts get a badge">
+              <span>Badge on every account</span>
+              <span class="switch"><input type="checkbox" name="showAll" role="switch" /></span>
+            </label>
+            <div class="row slider">
+              <label for="warnRate"><i class="dot warn"></i>High rate at</label>
+              <output for="warnRate" data-unit="/day"></output>
+              <input id="warnRate" type="range" name="warnRate" min="10" max="300" step="5" />
+            </div>
+            <div class="row slider">
+              <label for="botRate"><i class="dot bot"></i>Likely bot at</label>
+              <output for="botRate" data-unit="/day"></output>
+              <input id="botRate" type="range" name="botRate" min="50" max="1000" step="10" />
+            </div>
+          </div>
+
+          <h2>Posts from likely bots</h2>
+          <div class="segmented" role="radiogroup" aria-label="Posts from likely bots">
+            <label><input type="radio" name="botAction" value="label" /><span>Label</span></label>
+            <label><input type="radio" name="botAction" value="dim" /><span>Dim</span></label>
+            <label><input type="radio" name="botAction" value="collapse" /><span>Collapse</span></label>
+          </div>
+
+          <h2 title="Off: no badge, never dimmed or collapsed as a bot">Check these posts</h2>
+          <div class="chips">
+            <label><input type="checkbox" name="onReplies" /><span>Replies</span></label>
+            <label><input type="checkbox" name="onReposts" /><span>Reposts</span></label>
+            <label><input type="checkbox" name="onQuotes" /><span>Quoted posts</span></label>
+          </div>
+
+          <p class="note"><b>3/day</b> = average posts a day since joining, replies and reposts included. A hint, not proof.</p>
+        </section>
+
+        <section id="panel-replies" role="tabpanel" aria-labelledby="tab-replies" hidden>
+          <h2>Reply Filter</h2>
+          <div class="card">
+            <label class="row">
+              <span>Filter replies<small>Stock replies, copy-paste, promos, bots</small></span>
+              <span class="switch"><input type="checkbox" name="replyFilter" role="switch" /></span>
+            </label>
+            <div class="row slider named">
+              <input type="range" name="replyFilterSensitivity" min="0" max="2" step="1" data-values="lenient,balanced,strict" aria-label="Sensitivity" />
+              <span class="ticks" aria-hidden="true"><i>Lenient</i><i>Balanced</i><i>Strict</i></span>
+            </div>
+          </div>
+
+          <h2>Filtered replies</h2>
+          <div class="segmented" role="radiogroup" aria-label="Filtered replies">
+            <label><input type="radio" name="replyFilterMode" value="badge" /><span>Badge</span></label>
+            <label><input type="radio" name="replyFilterMode" value="collapse" /><span>Collapse</span></label>
+            <label><input type="radio" name="replyFilterMode" value="hide" /><span>Hide</span></label>
+          </div>
+
+          <div class="card">
+            <label class="stack">
+              <span>Never filter</span>
+              <textarea name="replyFilterAllow" rows="1" placeholder="@friend, @teammate" spellcheck="false"></textarea>
+            </label>
+            <label class="stack">
+              <span>Always filter replies containing</span>
+              <textarea name="replyFilterMuted" rows="1" placeholder="giveaway, 🚀" spellcheck="false"></textarea>
+            </label>
+          </div>
+
+          <p class="note">The post's author and people you follow are never filtered.</p>
+        </section>
+
+        <section id="panel-feed" role="tabpanel" aria-labelledby="tab-feed" hidden>
+          <h2 title="Uses X's own sensitive-content flags on posts, media and accounts">Adult (18+) content</h2>
+          <div class="segmented" role="radiogroup" aria-label="Adult content">
+            <label><input type="radio" name="adultAction" value="off" /><span>Off</span></label>
+            <label><input type="radio" name="adultAction" value="label" /><span>Label</span></label>
+            <label><input type="radio" name="adultAction" value="blur" /><span>Blur</span></label>
+            <label><input type="radio" name="adultAction" value="hide" /><span>Hide</span></label>
+          </div>
+          <div class="card">
+            <label class="row">
+              <span>Also match adult words<small>NSFW, 18+, OnlyFans, 🔞 in posts and names</small></span>
+              <span class="switch"><input type="checkbox" name="adultWords" role="switch" /></span>
+            </label>
+          </div>
+
+          <h2>Hide</h2>
+          <div class="chips">
+            <label title="Promoted posts"><input type="checkbox" name="hidePromoted" /><span>Ads</span></label>
+            <label><input type="checkbox" name="hideWhoToFollow" /><span>Who to follow</span></label>
+            <label title="The &quot;What's happening&quot; / trends box"><input type="checkbox" name="hideTrends" /><span>Trends</span></label>
+            <label title="The &quot;Subscribe to Premium&quot; box"><input type="checkbox" name="hidePremium" /><span>Premium</span></label>
+            <label title="The &quot;Live on X&quot; box"><input type="checkbox" name="hideLive" /><span>Live on X</span></label>
+          </div>
+
+          <h2>Posts</h2>
+          <div class="card">
+            <label class="row">
+              <span>Quote count on posts<small>A link to a post's quotes, which X hides on some posts</small></span>
+              <span class="switch"><input type="checkbox" name="showQuotes" role="switch" /></span>
+            </label>
+          </div>
+        </section>
+      </div>
     </form>
 
     <footer>

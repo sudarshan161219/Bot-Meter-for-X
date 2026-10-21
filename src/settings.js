@@ -22,6 +22,8 @@ globalThis.BOT_METER_DEFAULTS = {
   hideTrends: true,
   hidePremium: true,
   hideLive: true,
+  // On a post's page, add a link to its quotes (X hides it on some posts).
+  showQuotes: true,
   // Creator Tools > Reply Filter (on status pages). Mode: 'badge' | 'collapse' | 'hide'.
   replyFilter: true,
   replyFilterMode: 'badge',

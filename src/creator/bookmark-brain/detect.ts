@@ -10,9 +10,16 @@ import { get, isObj, str } from '../util';
 
 const BOOKMARK_OPERATION = /\/graphql\/[^/?]+\/Bookmark[A-Za-z]*(?:[/?]|$)/;
 
+/**
+ * The reader's bookmarks page. Since October 2026 X redirects /i/bookmarks to
+ * /i/history, whose first tab is Bookmarks (/i/history/likes is Likes, which
+ * isn't bookmarks). The old address and its folders are kept in case X goes back.
+ */
+export const isBookmarksPage = (pathname: string): boolean => /^\/i\/(?:bookmarks(?:\/|$)|history\/?$)/.test(pathname);
+
 /** A response from one of X's bookmark-list operations (or, for the first page load, the bookmarks page itself). */
 export function isBookmarkResponse(url: string | null, pathname: string): boolean {
-  return url === null ? /^\/i\/bookmarks(\/|$)/.test(pathname) : BOOKMARK_OPERATION.test(url);
+  return url === null ? isBookmarksPage(pathname) : BOOKMARK_OPERATION.test(url);
 }
 
 /** IDs of the posts in a response's timeline entries, in timeline order (newest bookmark first). */

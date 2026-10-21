@@ -134,7 +134,7 @@ a { color: inherit; text-decoration: none; }
 
 /* Settings screenshot */
 .popup-frame {
-  width: 334px;
+  width: 342px;
   justify-self: start;
   border: 1px solid #2f3336;
   border-radius: 12px;
@@ -142,7 +142,7 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
 }
 
-.popup-frame iframe { display: block; width: 334px; height: 592px; border: 0; }
+.popup-frame iframe { display: block; width: 340px; height: 568px; border: 0; }
 
 /* Static copies of the Reply Filter flag look, for legends. */
 .pill.flag { color: #e8590c; border: 1px dashed rgba(232, 89, 12, 0.7); }

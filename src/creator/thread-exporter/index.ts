@@ -4,7 +4,7 @@
 import type { TweetCache } from '../cache';
 import type { CoreHelpers } from '../core';
 import { fail, isDisabled } from '../log';
-import { pagePosts } from '../page';
+import { actionBar, pagePosts } from '../page';
 import type { Tweet } from '../types';
 import { openExportModal } from './modal';
 import { assembleThread, isThread, type Thread } from './thread';
@@ -77,10 +77,8 @@ export function startThreadExporter({ cache, helpers, onPageChange, openPrint, e
       }).catch((error: unknown) => fail(FEATURE, error));
     });
 
-    // X's action bar (reply, repost, like, bookmark, share) is marked with
-    // data-engagement-action; without it, put the button at the end of the post.
-    const like = [...article.querySelectorAll('[data-engagement-action="like"]')].find((el) => el.closest('article') === article);
-    const bar = like?.parentElement;
+    // In the post's action bar; without one, at the end of the post.
+    const bar = actionBar(article);
     if (bar) bar.append(button);
     else article.append(button);
   }

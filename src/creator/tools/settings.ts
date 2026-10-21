@@ -7,7 +7,7 @@ import { isObj } from '../util';
 export interface ToolsSettings {
   /** Export button on threads. */
   threadExporter: boolean;
-  /** Save bookmarks while on x.com/i/bookmarks. */
+  /** Save bookmarks while on the bookmarks page (see isBookmarksPage). */
   bookmarkBrain: boolean;
 }
 

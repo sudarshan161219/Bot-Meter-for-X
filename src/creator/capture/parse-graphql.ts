@@ -105,8 +105,18 @@ export function readableText(raw: string, range: unknown, links: unknown[], medi
   return text.replace(/&(?:amp|lt|gt);/g, (e) => ENTITIES[e] ?? e).trim();
 }
 
+/**
+ * A post object. Usually labelled __typename: 'Tweet', but inside a
+ * TweetWithVisibilityResults wrapper (posts that limit who can reply, and
+ * other visibility rules) X sends the post with no __typename at all; it's
+ * recognized by its author, as inject.js does.
+ */
+const isTweetNode = (node: Obj): boolean =>
+  node.__typename === 'Tweet' ||
+  (node.__typename === undefined && typeof node.rest_id === 'string' && isObj(get(node, 'core', 'user_results')));
+
 export function parseTweet(node: Obj): Tweet | null {
-  if (node.__typename !== 'Tweet') return null;
+  if (!isTweetNode(node)) return null;
   const id = str(node.rest_id);
   const legacy = node.legacy;
   const details = node.details;

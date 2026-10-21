@@ -74,6 +74,17 @@ describe('Bookmark Brain capture on x.com/i/bookmarks', () => {
     expect(panelButton()?.textContent).toBe('Sync all');
   });
 
+  it("keeps working after X redirects /i/bookmarks to /i/history, and leaves the Likes tab alone", () => {
+    history.pushState({}, '', '/i/history');
+    rerun();
+    expect(document.querySelector('[data-creator-tools="bookmarks"]')).not.toBeNull();
+    history.pushState({}, '', '/i/history/likes');
+    rerun();
+    expect(document.querySelector('[data-creator-tools="bookmarks"]')).toBeNull();
+    history.pushState({}, '', '/i/history');
+    rerun();
+  });
+
   it('removes its panel when the reader leaves the bookmarks page', () => {
     history.pushState({}, '', '/home');
     rerun();

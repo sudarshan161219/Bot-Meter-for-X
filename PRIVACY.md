@@ -21,7 +21,7 @@ open and is never saved or sent.
 server. It does not use analytics or tracking of any kind.
 
 **What the extension stores.** Only your settings (on/off, thresholds, how to treat likely bots,
-which posts to check, how to treat adult content, what to hide, and the Reply Filter's mode,
+which posts to check, how to treat adult content, what to hide, whether to show quote counts, and the Reply Filter's mode,
 sensitivity, never-filter list of handles and muted keywords), saved with Chrome's `storage.sync`
 so they follow your Chrome profile. No browsing data, account data, or post content is stored.
 

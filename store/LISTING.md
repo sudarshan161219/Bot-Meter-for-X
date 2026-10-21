@@ -39,6 +39,7 @@ FEATURES
 • Adult content filter: label, blur or hide posts X flags as sensitive, plus optional matching of adult-spam words (NSFW, 18+, OnlyFans)
 • Declutter: hide promoted posts and the "Who to follow", "What's happening", "Subscribe to Premium" and "Live on X" boxes
 • Reply Filter: on a post's page, flag, collapse or hide low-effort replies ("great post", 🔥🔥, copy-pasted text, crypto promotion, "follow back") and likely bots, with a lenient/balanced/strict setting, a never-filter list and muted keywords
+• Quote count: see how often a post was quoted (X hides this on some posts) and open its quotes, with bot badges on every quoting account
 • Works in reply threads, where bot replies pile up the most
 
 PRIVATE AND LIGHTWEIGHT

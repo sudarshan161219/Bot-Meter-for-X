@@ -68,7 +68,7 @@ Made by @buildwithSud.
 
 **Single purpose description:**
 ```
-Creator Tools for X helps people reuse content they've already loaded on X (x.com): it exports a thread the user is viewing (Markdown, image carousel, PDF or plain text), and saves the user's own X bookmarks, as they load on x.com/i/bookmarks, into a local library they can search, tag, annotate and export. Everything happens on x.com and on the user's device, using data X has already loaded into the page.
+Creator Tools for X helps people reuse content they've already loaded on X (x.com): it exports a thread the user is viewing (Markdown, image carousel, PDF or plain text), and saves the user's own X bookmarks, as they load on their bookmarks page on X, into a local library they can search, tag, annotate and export. Everything happens on x.com and on the user's device, using data X has already loaded into the page.
 ```
 
 **Permission justification: `storage`**

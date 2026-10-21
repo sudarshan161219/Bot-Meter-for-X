@@ -1,8 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { isBookmarkResponse, timelineTweetIds } from '../../src/creator/bookmark-brain/detect';
+import { isBookmarkResponse, isBookmarksPage, timelineTweetIds } from '../../src/creator/bookmark-brain/detect';
 
 const user = { result: { __typename: 'User', rest_id: '7', core: { screen_name: 'someone', name: 'S' } } };
 const tweet = (id: string, extra: object = {}) => ({ result: { __typename: 'Tweet', rest_id: id, core: { user_results: user }, details: { full_text: id }, ...extra } });
+
+describe('isBookmarksPage', () => {
+  it("knows X's bookmarks page at its new address (/i/history) and the old one, but not Likes", () => {
+    expect(isBookmarksPage('/i/history')).toBe(true);
+    expect(isBookmarksPage('/i/history/')).toBe(true);
+    expect(isBookmarksPage('/i/bookmarks')).toBe(true);
+    expect(isBookmarksPage('/i/bookmarks/12345')).toBe(true);
+    expect(isBookmarksPage('/i/history/likes')).toBe(false);
+    expect(isBookmarksPage('/home')).toBe(false);
+  });
+});
 
 describe('isBookmarkResponse', () => {
   it("matches X's bookmark-list operations, and the bookmarks page's first load", () => {
@@ -12,6 +23,8 @@ describe('isBookmarkResponse', () => {
     expect(isBookmarkResponse('https://api.x.com/graphql/abc123/HomeTimeline', '/i/bookmarks')).toBe(false);
     expect(isBookmarkResponse(null, '/i/bookmarks')).toBe(true);
     expect(isBookmarkResponse(null, '/i/bookmarks/12345')).toBe(true);
+    expect(isBookmarkResponse(null, '/i/history')).toBe(true);
+    expect(isBookmarkResponse(null, '/i/history/likes')).toBe(false);
     expect(isBookmarkResponse(null, '/home')).toBe(false);
   });
 });

@@ -15,6 +15,8 @@ export interface CreatorSettings {
   replyFilterSensitivity: Sensitivity;
   replyFilterAllow: string;
   replyFilterMuted: string;
+  /** Quote-count link on a post's page. */
+  showQuotes: boolean;
 }
 
 const FALLBACK: CreatorSettings = {
@@ -24,6 +26,7 @@ const FALLBACK: CreatorSettings = {
   replyFilterSensitivity: 'balanced',
   replyFilterAllow: '',
   replyFilterMuted: '',
+  showQuotes: true,
 };
 
 const MODES: readonly ReplyFilterMode[] = ['badge', 'collapse', 'hide'];
@@ -35,7 +38,7 @@ const pick = <T extends string>(value: unknown, allowed: readonly T[], fallback:
 /** Stored values -> typed settings; anything missing or malformed falls back to the default. */
 export function coerceSettings(raw: unknown): CreatorSettings {
   const r = isObj(raw) ? raw : {};
-  const bool = (key: 'enabled' | 'replyFilter'): boolean =>
+  const bool = (key: 'enabled' | 'replyFilter' | 'showQuotes'): boolean =>
     typeof r[key] === 'boolean' ? (r[key] as boolean) : FALLBACK[key];
   const text = (key: 'replyFilterAllow' | 'replyFilterMuted'): string =>
     typeof r[key] === 'string' ? (r[key] as string).slice(0, 4000) : FALLBACK[key];
@@ -46,6 +49,7 @@ export function coerceSettings(raw: unknown): CreatorSettings {
     replyFilterSensitivity: pick(r.replyFilterSensitivity, SENSITIVITIES, FALLBACK.replyFilterSensitivity),
     replyFilterAllow: text('replyFilterAllow'),
     replyFilterMuted: text('replyFilterMuted'),
+    showQuotes: bool('showQuotes'),
   };
 }
 

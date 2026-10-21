@@ -14,7 +14,7 @@
       <section class="pitch">
         <img src="../icons/icon128.png" width="72" height="72" alt="" />
         <h1>Tune it to your feed</h1>
-        <p>Set your own thresholds, then label, dim or hide likely bots and adult content.</p>
+        <p>Set your own thresholds, then label, dim or hide likely bots, spam replies and adult content.</p>
         <ul>
           <li>✓ No login, no API key</li>
           <li>✓ No extra requests: reads data X already loads</li>
@@ -35,8 +35,12 @@
         for (const [key, value] of Object.entries(BOT_METER_DEFAULTS)) {
           const field = form.elements[key];
           if (!field) continue;
+          const steps = field.dataset?.values?.split(',');
           if (field.type === 'checkbox') field.checked = value;
-          else field.value = value;
+          else if (steps) field.value = String(steps.indexOf(value));
+          else field.value = value; // a radio group checks the matching button
+          const output = form.querySelector(`output[for="${field.id}"]`);
+          if (output) output.textContent = value;
         }
       });
     </script>

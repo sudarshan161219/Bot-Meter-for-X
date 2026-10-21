@@ -15,6 +15,9 @@ import { type ToolsSettings, watchToolsSettings } from './settings';
 const cache = new TweetCache();
 // Features stay off until the reader's settings have loaded.
 let settings: ToolsSettings | null = null;
+// Bookmark lists that arrived before the settings did (the first page load's
+// data can land first); handed over once the settings are known.
+let earlyBookmarkIds: string[] | null = [];
 
 /** Sends a message to the service worker; null if it fails (e.g. the extension was just updated). */
 async function ask(message: object): Promise<Record<string, unknown> | null> {
@@ -35,7 +38,9 @@ window.addEventListener('message', (event: MessageEvent<unknown>) => {
     if (authors.length) cache.putAuthors(authors);
     if (tweets.length) cache.putTweets(tweets);
     const ids = arr(data.bookmarks).map(str).filter((id): id is string => id !== null && /^\d{1,20}$/.test(id));
-    if (ids.length) bookmarks.fromResponse(ids);
+    if (!ids.length) return;
+    if (earlyBookmarkIds) earlyBookmarkIds.push(...ids);
+    else bookmarks.fromResponse(ids);
   } catch (error) {
     fail('capture', error);
   }
@@ -61,6 +66,11 @@ const schedule = onPageChange(() => {
 
 watchToolsSettings((next) => {
   settings = next;
+  if (earlyBookmarkIds) {
+    const ids = earlyBookmarkIds;
+    earlyBookmarkIds = null;
+    if (ids.length) bookmarks.fromResponse(ids);
+  }
   schedule();
 });
 
