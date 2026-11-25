@@ -68,8 +68,12 @@ export function startQuoteLink(
     // either way: a missing count reads as 0, so hiding at 0 could hide real quotes.
     const count = tweet?.source === 'graphql' ? tweet.metrics.quotes : null;
 
+    // X shows its own "View quotes" link on some posts: then ours isn't needed.
+    const xHasLink =
+      !!id && [...document.querySelectorAll(`a[href$="/status/${id}/quotes" i]`)].some((a) => !a.classList.contains('bm-quotes'));
+
     let keep: Element | null = null;
-    if (post && bar) {
+    if (post && bar && !xHasLink) {
       let link = bar.querySelector<HTMLAnchorElement>(':scope > .bm-quotes');
       if (!link) {
         link = document.createElement('a');

@@ -80,6 +80,20 @@ describe('classic X (signed in)', () => {
   });
 });
 
+describe("when X shows its own link", () => {
+  it('steps aside, and comes back if X removes it', async () => {
+    const own = document.createElement('a');
+    own.href = `/maya_writes/status/${ID}/quotes`;
+    own.textContent = 'View quotes';
+    document.querySelector('article')!.append(own);
+    await settle();
+    expect(link()).toBeNull();
+    own.remove();
+    await settle();
+    expect(link()?.textContent).toBe('View 5 quotes');
+  });
+});
+
 describe('helpers', () => {
   it('formats counts like X and finds the post a page is about', () => {
     expect(quoteLabel(4229)).toBe('View 4.2K quotes');

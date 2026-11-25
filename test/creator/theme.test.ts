@@ -125,6 +125,22 @@ describe('themeCss', () => {
     document.documentElement.classList.remove('bm-theme');
   });
 
+  it('keeps dialogs, menus and the photo viewer solid over a background', () => {
+    const withBackdrop = themeCss(resolveTheme({ theme: 'midnight', themeColor: '', backdrop: 'image', backdropDim: 55 }, 'data:image/png;base64,AAAA')!, rules);
+    expect(withBackdrop).toContain('.r-kemksi { background-color: transparent !important; }');
+    expect(withBackdrop).toMatch(/\[aria-modal="true"\].*:is\(\.r-kemksi\) \{ background-color: #0b1020 !important; \}/);
+    // Later in the sheet, and more specific, so it wins inside a layer.
+    expect(withBackdrop.lastIndexOf(':is(.r-kemksi)')).toBeGreaterThan(withBackdrop.indexOf('.r-kemksi { background-color: transparent'));
+    // A translucent panel behind the feed column, after the page rules so it wins.
+    expect(withBackdrop).toContain('html.bm-theme [data-testid="primaryColumn"] { background-color: rgba(11, 16, 32, 0.78) !important; }');
+    expect(withBackdrop.indexOf('primaryColumn')).toBeGreaterThan(withBackdrop.indexOf('.r-kemksi { background-color: transparent'));
+    const firmer = themeCss(resolveTheme({ theme: 'midnight', themeColor: '', backdrop: 'aurora', backdropDim: 90 }, null)!, rules);
+    expect(firmer).toContain('rgba(11, 16, 32, 0.9) !important');
+    // Without a background nothing is see-through, so no extra rules.
+    const plain = themeCss(resolveTheme({ theme: 'midnight', themeColor: '', backdrop: 'none', backdropDim: 55 }, null)!, rules);
+    expect(plain).not.toContain('aria-modal');
+  });
+
   it('scopes selectors safely', () => {
     expect(scoped('.x')).toBe('html.bm-theme .x');
     expect(scoped('.x, .y')).toBe('html.bm-theme :is(.x, .y)');

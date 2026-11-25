@@ -247,7 +247,36 @@ export function themeCss(theme: ResolvedTheme, rules: readonly ColorRule[]): str
     if (role && selector) lines.push(`${selector} { ${r.prop}: ${roles[role]} !important; }`);
   }
   lines.push(...inlineCss(roles));
+  if (backdrop) {
+    // A calmer layer behind the feed column so post text reads well over a busy
+    // picture; the backdrop stays visible around it. Firmer as Readability goes up.
+    const panel = Math.min(0.6 + dim / 300, 0.9).toFixed(2);
+    lines.push(`html.bm-theme [data-testid="primaryColumn"] { background-color: ${alpha(p.bg, Number(panel))} !important; }`);
+    lines.push(...layeredCss(rules, p.bg));
+  }
   return lines.join('\n');
+}
+
+/**
+ * Over a backdrop the page colour turns see-through, but X also uses it for
+ * things drawn on top of the page (the photo viewer's side panel, dialogs, menus,
+ * hover cards). Those keep a solid colour, or the page underneath shows through
+ * and text overlaps.
+ */
+const LAYERS = '[role="dialog"], [aria-modal="true"], [role="menu"], [role="listbox"], [data-testid="HoverCard"], [data-testid="sheetDialog"]';
+const IN_LAYER = `html.bm-theme :is(${LAYERS}, :is(${LAYERS}) *)`;
+
+function layeredCss(rules: readonly ColorRule[], solid: string): string[] {
+  const out: string[] = [];
+  for (const r of rules) {
+    if (propKind(r.prop) !== 'background' || roleOf('background', r.value) !== 'bg' || r.selector.includes('::')) continue;
+    out.push(`${IN_LAYER}:is(${r.selector}) { background-color: ${solid} !important; }`);
+  }
+  for (const [k, role] of Object.entries(X_BACKGROUND)) {
+    if (role !== 'bg') continue;
+    out.push(`${IN_LAYER}[style*="background-color: rgb(${k.split(',').join(', ')})"] { background-color: ${solid} !important; }`);
+  }
+  return out;
 }
 
 /**
