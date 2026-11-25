@@ -146,6 +146,8 @@ Bot Meter's core (`src/*.js`) is plain JavaScript with no build step. Creator To
 npm run build:creator                 # build src/gen/ (needed before loading unpacked)
 npm run typecheck                     # strict TypeScript check of src/creator and its tests
 npm test                              # builds, then core tests (node:test) + Creator tests (Vitest)
+npm run bump -- patch                 # Bot Meter version: patch | minor | major | 2.1.0 (manifest + package files)
+npm run bump -- minor --tools         # same for Creator Tools for X (creator-tools/manifest.json)
 python3 -m http.server 8765           # then open http://127.0.0.1:8765/test/harness.html
 ```
 
