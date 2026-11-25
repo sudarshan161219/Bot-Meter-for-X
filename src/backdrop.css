@@ -1,0 +1,179 @@
+:root {
+  --bg: #ffffff;
+  --fg: #0f1419;
+  --muted: #536471;
+  --line: #eff3f4;
+  --card: #f7f9f9;
+  --accent: #1d9bf0;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --fg: #e7e9ea;
+    --muted: #71767b;
+    --line: #2f3336;
+    --card: #16181c;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+header p {
+  margin: 2px 0 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.drop {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  padding: 36px 16px;
+  border: 2px dashed var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  text-align: center;
+  cursor: pointer;
+}
+
+.drop:hover,
+.drop.over {
+  border-color: var(--accent);
+}
+
+.drop input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.drop strong {
+  color: var(--accent);
+  font-size: 17px;
+}
+
+#editor {
+  margin-top: 24px;
+}
+
+.preview {
+  display: grid;
+  place-items: center;
+  height: 340px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.mock {
+  width: min(420px, 86%);
+  display: grid;
+  gap: 1px;
+}
+
+.mock-post {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  color: #e7e9ea;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mock-post i {
+  flex: 0 0 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f7a8b8, #b36ae2);
+}
+
+.mock-post + .mock-post i {
+  background: linear-gradient(135deg, #1d9bf0, #0f4c81);
+}
+
+.mock-post span {
+  color: rgba(231, 233, 234, 0.65);
+}
+
+.mock-post p {
+  margin: 2px 0 0;
+}
+
+.dim {
+  display: grid;
+  gap: 6px;
+  margin: 18px 0;
+}
+
+.dim span {
+  font-weight: 600;
+}
+
+.dim input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+button {
+  padding: 8px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button.primary {
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Bot Meter uninstalled</title>
+    <meta name="description" content="Bot Meter has been removed. Tell us why in one click, so the next version is better." />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="assets/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <a class="brand" href="./"><img src="assets/icon128.png" alt="" />Bot Meter</a>
+        <nav aria-label="Site">
+          <a href="./">Home</a>
+          <a href="privacy.html">Privacy</a>
+        </nav>
+      </header>
+
+      <main class="doc leave">
+        <h1>Sorry to see Bot Meter go</h1>
+        <p class="lede">Bot Meter has been removed from your browser. Tell me why in one click, and the next version will be better for it.</p>
+
+        <form id="leave" class="leave-form" hidden>
+          <fieldset>
+            <legend>Why did you uninstall it?</legend>
+            <div class="reasons">
+              <label><input type="radio" name="reason" value="No badges showed up on X" required /><span>No badges showed up on X</span></label>
+              <label><input type="radio" name="reason" value="It flagged real people as bots" /><span>It flagged real people as bots</span></label>
+              <label><input type="radio" name="reason" value="Too many badges, it cluttered my feed" /><span>Too many badges, it cluttered my feed</span></label>
+              <label><input type="radio" name="reason" value="It hid or filtered things I wanted to see" /><span>It hid or filtered things I wanted to see</span></label>
+              <label><input type="radio" name="reason" value="It slowed X down or broke something" /><span>It slowed X down or broke something</span></label>
+              <label><input type="radio" name="reason" value="I only needed it for a while" /><span>I only needed it for a while</span></label>
+              <label><input type="radio" name="reason" value="I found something better" /><span>I found something better</span></label>
+              <label><input type="radio" name="reason" value="Other" /><span>Other</span></label>
+            </div>
+          </fieldset>
+
+          <label class="details">
+            <span>Anything else? <small>Optional. What would have made you keep it?</small></span>
+            <textarea name="details" rows="3" maxlength="1000"></textarea>
+          </label>
+
+          <div class="actions">
+            <button type="submit" class="cta">Send</button>
+            <span class="note">
+              Sent anonymously to a Google Form: just your answer and the Bot Meter version. No name, email or browsing data.
+            </span>
+          </div>
+        </form>
+
+        <div id="thanks" class="summary-box" hidden role="status">
+          <p><strong>Thank you.</strong> Every answer is read, and the common ones decide what gets fixed next.</p>
+        </div>
+
+        <p id="error" class="note" hidden role="alert">
+          Couldn't send that (are you offline?). You can also tell me on X: <a href="https://x.com/buildwithSud">@buildwithSud</a>.
+        </p>
+
+        <h2>Removed it by mistake?</h2>
+        <p><a class="cta" href="https://github.com/sudarshan161219/Bot-Meter-for-X#install">Reinstall Bot Meter</a></p>
+
+        <h2>Something not working?</h2>
+        <p>
+          Bugs get fixed fastest on <a href="https://github.com/sudarshan161219/Bot-Meter-for-X/issues">GitHub</a>, or message
+          <a href="https://x.com/buildwithSud">@buildwithSud</a> on X.
+        </p>
+      </main>
+
+      <footer class="foot">
+        <span>Bot Meter is not affiliated with or endorsed by X Corp.</span>
+        <nav aria-label="Footer">
+          <a href="./">Home</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="https://buymeacoffee.com/sudarshanhosalli">Buy me a coffee</a>
+        </nav>
+      </footer>
+    </div>
+    <script src="uninstall.js"></script>
+  </body>
+</html>

@@ -6,6 +6,7 @@
 // - DOM fallback: after each core page scan, posts that never arrived as data
 //   are read from the page (partial, marked source: 'dom').
 // - Reply Filter: flags, collapses or hides low-effort replies on post pages.
+// - Theme: repaints X with a preset or custom colour and an optional background.
 // - Quote link: a "View 60 quotes" link on a post's page (X hides it on some posts).
 
 import { readArticle } from '../capture/dom-fallback';
@@ -14,6 +15,7 @@ import { getCore } from '../core';
 import { fail, isDisabled, warnOnce } from '../log';
 import { startQuoteLink } from '../quotes';
 import { startReplyFilter } from '../reply-filter';
+import { startTheme } from '../theme';
 import { watchSettings } from '../settings';
 import { isObj } from '../util';
 import { cache } from './store';
@@ -68,6 +70,7 @@ if (!core) {
   });
   startReplyFilter(core, cache, watchSettings);
   startQuoteLink(core, cache, watchSettings);
+  startTheme(core, watchSettings);
 }
 
 // For manual checks: in DevTools, pick the "Bot Meter for X" context in the

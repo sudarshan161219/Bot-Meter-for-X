@@ -32,4 +32,12 @@ globalThis.BOT_METER_DEFAULTS = {
   // Comma- or line-separated: handles never filtered, and words that always filter a reply.
   replyFilterAllow: '',
   replyFilterMuted: '',
+  // Look: 'x' (X's own colours), a preset ('midnight', 'ocean', 'forest', 'rose', 'sepia', 'slate') or 'custom'.
+  theme: 'x',
+  themeColor: '#1e2a38',
+  // Page background: 'none', a gradient ('aurora', 'sunset', 'ocean', 'dusk', 'candy') or 'image'
+  // (the uploaded picture lives in chrome.storage.local, too big for sync).
+  backdrop: 'none',
+  // 0–90: how much the theme colour covers the background, so posts stay readable.
+  backdropDim: 55,
 };

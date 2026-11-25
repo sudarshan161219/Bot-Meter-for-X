@@ -29,9 +29,17 @@ unpacked extensions in `chrome://extensions`, and refresh x.com.
 - [ ] On a quoted post's page, a "View N quotes" pill ends the action bar; it opens the post's quotes list.
 - [ ] Without a count it reads "View quotes"; the Feed tab's switch removes it.
 
+## Look (Bot Meter → popup → Look)
+
+- [ ] Each preset recolours the feed, sidebar, cards and borders; post text stays readable (try Sepia and Slate too).
+- [ ] Custom: any colour, including mid-tones, keeps text readable.
+- [ ] Gradients and a photo show behind the feed; the Readability slider changes how much they show.
+- [ ] "Choose photo…" opens the photo page; Use this photo / Remove photo work; nothing reloads X needlessly.
+- [ ] Choosing X (and None) restores X's own look; the header switch off restores it too.
+
 ## Popup (Bot Meter)
 
-- [ ] The three tabs (Bots, Replies, Feed) fit without scrolling, in light and dark mode.
+- [ ] The four tabs (Bots, Replies, Feed, Look) fit without scrolling, in light and dark mode.
 - [ ] Every switch, segmented button, slider and list saves and still applies after reopening the popup.
 - [ ] The header switch fades the settings and turns Bot Meter off on the page.
 

@@ -34,8 +34,14 @@ An account that has averaged 200 posts a day for years is very likely automated.
 - **Quote count:** X hides how often a post was quoted, and the link to its quotes, on some posts. On a post's
   page Bot Meter adds a "View 60 quotes" link to the action bar that opens X's own list of quote posts,
   where the badges show which quoting accounts look automated.
+- **Themes:** repaint X with a preset (Midnight, Ocean, Forest, Rose, Sepia, Slate) or any colour,
+  with a gradient or your own photo behind the feed and a readability slider. It finds the rules in
+  X's own stylesheets that use X's theme colours and points each at the same role in your theme
+  (`src/creator/theme/`), so it works over any of X's three themes. Photos are picked on
+  `src/backdrop.html`, shrunk, and kept in `chrome.storage.local`.
 - Everything is set in the toolbar popup: **Bots** (badges, thresholds, what to do with likely
-  bots), **Replies** (Reply Filter) and **Feed** (adult content, decluttering, quote count).
+  bots), **Replies** (Reply Filter), **Feed** (adult content, decluttering, quote count) and
+  **Look** (theme and background).
 
 ## Install
 
@@ -163,3 +169,18 @@ Pages:
    Web Store).
 
 Once the store listing is approved, point the "Get Bot Meter" button in `docs/index.html` at it.
+
+### Uninstall feedback
+
+When Bot Meter is removed, Chrome opens `docs/uninstall.html` (set by `src/background.js`, with the
+version in the URL). Answers go straight to a Google Form; the form stays hidden until one is
+connected:
+
+1. Create a Google Form with three "Short answer" questions: Reason, Details, Version.
+2. In the form's ⋮ menu choose **Get pre-filled link**, type anything into each field, then
+   **Get link**. The link contains `entry.<number>=` once per field.
+3. In `docs/uninstall.js`, set `FORM_ID` (the long id in `docs.google.com/forms/d/e/<FORM_ID>/viewform`)
+   and the three `entry.<number>` values, in the order Reason, Details, Version.
+4. Push; answers then show up in the form's **Responses** tab (or a linked Google Sheet).
+
+Point the page's "Reinstall Bot Meter" button at the store listing too, once it's live.

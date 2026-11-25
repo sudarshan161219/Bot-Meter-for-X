@@ -401,3 +401,96 @@ footer a {
 footer a:hover {
   text-decoration: underline;
 }
+
+/* --- Look tab: colour swatches (radio buttons) --- */
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 6px;
+}
+
+.swatches label {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.swatches input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sw {
+  width: 100%;
+  height: 34px;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  background-size: cover;
+  background-position: center;
+}
+
+.sw.x-default {
+  background: linear-gradient(135deg, #000 0 50%, #fff 50% 100%);
+}
+
+.sw.none {
+  background:
+    linear-gradient(135deg, transparent calc(50% - 1px), var(--muted) 50%, transparent calc(50% + 1px)),
+    var(--card);
+}
+
+.sw.custom {
+  background: conic-gradient(#f87171, #fbbf24, #34d399, #60a5fa, #a78bfa, #f87171);
+}
+
+.sw.photo {
+  background:
+    linear-gradient(160deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371767b'%3E%3Cpath d='M4 5h16v14H4zM6 17h12l-4-5-3 4-2-2z'/%3E%3C/svg%3E") center / 22px no-repeat,
+    var(--card);
+}
+
+.swatches input:checked ~ .sw {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+.swatches input:checked ~ span {
+  color: var(--fg);
+}
+
+.swatches input:focus-visible ~ .sw {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+input[type="color"] {
+  width: 44px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+}
+
+.pill {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pill:hover {
+  border-color: var(--accent);
+}

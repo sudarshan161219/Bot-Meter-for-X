@@ -1,6 +1,6 @@
 # Privacy Policy: Bot Meter for X
 
-_Last updated: October 17, 2026_
+_Last updated: October 25, 2026_
 
 Bot Meter for X does not collect, store, sell, or transmit any personal data.
 
@@ -22,9 +22,16 @@ server. It does not use analytics or tracking of any kind.
 
 **What the extension stores.** Only your settings (on/off, thresholds, how to treat likely bots,
 which posts to check, how to treat adult content, what to hide, whether to show quote counts, and the Reply Filter's mode,
-sensitivity, never-filter list of handles and muted keywords), saved with Chrome's `storage.sync`
-so they follow your Chrome profile. No browsing data, account data, or post content is stored.
+sensitivity, never-filter list of handles and muted keywords, and your theme and background
+choices), saved with Chrome's `storage.sync` so they follow your Chrome profile. If you choose your
+own background photo, it is shrunk and kept with Chrome's `storage.local` on this computer only; it
+is never uploaded. No browsing data, account data, or post content is stored.
 
-**Third parties.** None. No data is shared with anyone.
+**When you uninstall.** Chrome opens a short page on the Bot Meter website (with the version
+number in its address) asking why you removed it. Answering is optional. If you do, your choice,
+any comment you type and the version number are sent to a Google Form, and nothing else: no name,
+email or browsing data. The extension itself sends nothing.
+
+**Third parties.** None, apart from Google Forms for uninstall feedback you choose to send.
 
 **Contact.** Questions: [@buildwithSud](https://x.com/buildwithSud) on X.

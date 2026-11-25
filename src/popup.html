@@ -23,6 +23,7 @@
         <button type="button" role="tab" id="tab-bots" aria-controls="panel-bots" aria-selected="true">Bots</button>
         <button type="button" role="tab" id="tab-replies" aria-controls="panel-replies" aria-selected="false">Replies</button>
         <button type="button" role="tab" id="tab-feed" aria-controls="panel-feed" aria-selected="false">Feed</button>
+        <button type="button" role="tab" id="tab-look" aria-controls="panel-look" aria-selected="false">Look</button>
       </nav>
 
       <div class="panels">
@@ -126,6 +127,49 @@
               <span>Quote count on posts<small>A link to a post's quotes, which X hides on some posts</small></span>
               <span class="switch"><input type="checkbox" name="showQuotes" role="switch" /></span>
             </label>
+          </div>
+        </section>
+
+        <!-- Swatch colours mirror PRESETS and GRADIENTS in src/creator/theme/palette.ts. -->
+        <section id="panel-look" role="tabpanel" aria-labelledby="tab-look" hidden>
+          <h2>Theme</h2>
+          <div class="swatches" role="radiogroup" aria-label="Theme">
+            <label title="X's own colours"><input type="radio" name="theme" value="x" /><i class="sw x-default"></i><span>X</span></label>
+            <label><input type="radio" name="theme" value="midnight" /><i class="sw" style="background:#0b1020"></i><span>Midnight</span></label>
+            <label><input type="radio" name="theme" value="ocean" /><i class="sw" style="background:#0b1d26"></i><span>Ocean</span></label>
+            <label><input type="radio" name="theme" value="forest" /><i class="sw" style="background:#0f1a14"></i><span>Forest</span></label>
+            <label><input type="radio" name="theme" value="rose" /><i class="sw" style="background:#1f1418"></i><span>Rose</span></label>
+            <label><input type="radio" name="theme" value="sepia" /><i class="sw" style="background:#f4ecd8"></i><span>Sepia</span></label>
+            <label><input type="radio" name="theme" value="slate" /><i class="sw" style="background:#eef1f5"></i><span>Slate</span></label>
+            <label title="Pick any colour"><input type="radio" name="theme" value="custom" /><i class="sw custom" id="custom-swatch"></i><span>Custom</span></label>
+          </div>
+          <div class="card" id="custom-row" hidden>
+            <label class="row">
+              <span>Custom colour<small>Text and borders adjust to stay readable</small></span>
+              <input type="color" name="themeColor" />
+            </label>
+          </div>
+
+          <h2>Background</h2>
+          <div class="swatches" role="radiogroup" aria-label="Background">
+            <label><input type="radio" name="backdrop" value="none" /><i class="sw none"></i><span>None</span></label>
+            <label><input type="radio" name="backdrop" value="aurora" /><i class="sw" style="background:linear-gradient(160deg,#0f2027,#203a43,#2c5364)"></i><span>Aurora</span></label>
+            <label><input type="radio" name="backdrop" value="sunset" /><i class="sw" style="background:linear-gradient(160deg,#1a0b2e,#4a1942,#c94b4b)"></i><span>Sunset</span></label>
+            <label><input type="radio" name="backdrop" value="ocean" /><i class="sw" style="background:linear-gradient(160deg,#021b2e,#0a4d68,#088395)"></i><span>Deep sea</span></label>
+            <label><input type="radio" name="backdrop" value="dusk" /><i class="sw" style="background:linear-gradient(160deg,#141e30,#243b55)"></i><span>Dusk</span></label>
+            <label><input type="radio" name="backdrop" value="candy" /><i class="sw" style="background:linear-gradient(135deg,#fbc2eb,#a6c1ee)"></i><span>Candy</span></label>
+            <label title="Your own picture"><input type="radio" name="backdrop" value="image" /><i class="sw photo" id="photo-swatch"></i><span>Photo</span></label>
+          </div>
+          <div class="card" id="backdrop-row" hidden>
+            <div class="row slider">
+              <label for="backdropDim">Readability</label>
+              <output for="backdropDim" data-unit="%"></output>
+              <input id="backdropDim" type="range" name="backdropDim" min="0" max="90" step="5" />
+            </div>
+            <div class="row" id="photo-row" hidden>
+              <span id="photo-state">No photo yet</span>
+              <button type="button" class="pill" id="choose-photo">Choose photo…</button>
+            </div>
           </div>
         </section>
       </div>

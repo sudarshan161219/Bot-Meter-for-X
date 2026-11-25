@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Background photo · Bot Meter</title>
+    <link rel="icon" href="../icons/icon32.png" />
+    <link rel="stylesheet" href="backdrop.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="../icons/icon32.png" alt="" width="28" height="28" />
+        <div>
+          <h1>Background photo for X</h1>
+          <p class="muted">Shown behind your feed on x.com. It stays on this computer; nothing is uploaded.</p>
+        </div>
+      </header>
+
+      <label id="drop" class="drop">
+        <input id="file" type="file" accept="image/png, image/jpeg, image/webp, image/gif" />
+        <strong>Choose a photo</strong>
+        <span class="muted">or drop one here · JPG, PNG, WebP or GIF (GIFs up to 3.5 MB keep moving)</span>
+      </label>
+
+      <section id="editor" hidden>
+        <div id="preview" class="preview" aria-label="Preview">
+          <div class="mock">
+            <div class="mock-post"><i></i><div><b>Maya Chen</b> <span>@maya_writes · 2h</span><p>Finally finished the first draft. Going to sleep for a week.</p></div></div>
+            <div class="mock-post"><i></i><div><b>Newsdesk Daily</b> <span>@newsdesk_daily · 12m</span><p>Live updates: the council votes on the transit plan tonight.</p></div></div>
+          </div>
+        </div>
+
+        <label class="dim">
+          <span>Readability <output id="dim-value"></output></span>
+          <input id="dim" type="range" min="0" max="90" step="5" />
+          <small class="muted">How much of your theme colour covers the photo so posts stay easy to read.</small>
+        </label>
+
+        <div class="actions">
+          <button id="save" type="button" class="primary">Use this photo</button>
+          <button id="remove" type="button">Remove photo</button>
+          <span id="status" class="muted" role="status"></span>
+        </div>
+      </section>
+    </main>
+    <script src="settings.js"></script>
+    <script src="backdrop.js"></script>
+  </body>
+</html>

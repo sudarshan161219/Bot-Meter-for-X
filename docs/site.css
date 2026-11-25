@@ -396,6 +396,53 @@ table.perm th, table.perm td { padding: 10px 12px; border-bottom: 1px solid var(
 table.perm th { color: var(--muted); font-weight: 600; }
 .table-box { overflow-x: auto; }
 
+/* Uninstall page */
+.leave .lede { margin-bottom: 30px; }
+.leave h2 { font-size: 22px; }
+.leave-form fieldset { margin: 0; padding: 0; border: 0; }
+.leave-form legend { margin-bottom: 12px; font: 700 20px/1.25 var(--display); }
+
+.reasons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.reasons label { display: flex; }
+.reasons input { position: absolute; opacity: 0; pointer-events: none; }
+
+.reasons span {
+  flex: 1;
+  padding: 13px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 16px;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.reasons span:hover { border-color: var(--muted); }
+.reasons input:checked + span { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--zone-ok); }
+.reasons input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.details { display: grid; gap: 8px; margin: 22px 0; }
+.details span { font-weight: 600; }
+.details small { display: block; color: var(--muted); font-weight: 400; font-size: 14px; }
+
+.details textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 16px/1.5 var(--body);
+  resize: vertical;
+}
+
+.details textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.leave-form .actions .note { max-width: 30em; }
+button.cta { border: 0; font: 600 17px/1 var(--body); cursor: pointer; }
+button.cta:disabled { opacity: 0.6; cursor: default; }
+#thanks, #error { margin-top: 8px; }
+[hidden] { display: none !important; }
+
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; gap: 36px; padding-block: 20px 40px; }
   .steps { grid-template-columns: 1fr; }
@@ -404,6 +451,7 @@ table.perm th { color: var(--muted); font-weight: 600; }
 
 @media (max-width: 520px) {
   .top nav a.hide-sm { display: none; }
+  .reasons { grid-template-columns: 1fr; }
   .band { padding-block: 48px; }
 }
 

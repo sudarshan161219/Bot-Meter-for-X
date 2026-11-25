@@ -30,6 +30,7 @@ chrome.storage.sync.get(DEFAULTS, (settings) => {
     if (field.type === 'range' && !names) showValue(field);
   }
   showEnabled(settings.enabled);
+  showLook();
 });
 
 function save(field) {
@@ -49,7 +50,46 @@ function save(field) {
   } else value = field.value;
   if (field.name === 'enabled') showEnabled(value);
   chrome.storage.sync.set({ [field.name]: value });
+  showLook();
 }
+
+// --- Look tab ---
+
+const PHOTO_KEY = 'backdropImage';
+
+// Show only the controls the current choice needs, and preview the custom colour and photo.
+function showLook() {
+  const theme = form.elements.theme.value;
+  const backdrop = form.elements.backdrop.value;
+  document.getElementById('custom-row').hidden = theme !== 'custom';
+  document.getElementById('custom-swatch').style.background = theme === 'custom' ? form.elements.themeColor.value : '';
+  document.getElementById('backdrop-row').hidden = backdrop === 'none' || !backdrop;
+  document.getElementById('photo-row').hidden = backdrop !== 'image';
+}
+
+// Only an image data: URL is ever shown (same check as the page's theme code).
+const IMAGE_DATA_URL = /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/]+=*$/;
+
+function showPhoto(value) {
+  const dataUrl = typeof value === 'string' && IMAGE_DATA_URL.test(value) ? value : null;
+  const swatch = document.getElementById('photo-swatch');
+  swatch.style.background = dataUrl ? `center / cover no-repeat url("${dataUrl}")` : '';
+  document.getElementById('photo-state').textContent = dataUrl ? 'Your photo' : 'No photo yet';
+  document.getElementById('choose-photo').textContent = dataUrl ? 'Change…' : 'Choose photo…';
+}
+
+chrome.storage.local.get(PHOTO_KEY, (stored) => showPhoto(stored[PHOTO_KEY]));
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && PHOTO_KEY in changes) showPhoto(changes[PHOTO_KEY].newValue);
+});
+
+// The picture is picked on its own page: a file dialog can close the popup.
+document.getElementById('choose-photo').addEventListener('click', () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('src/backdrop.html') });
+  window.close();
+});
+
+form.elements.themeColor.addEventListener('input', showLook);
 
 form.addEventListener('change', (event) => save(event.target));
 

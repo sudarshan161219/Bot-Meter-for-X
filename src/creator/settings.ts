@@ -17,6 +17,14 @@ export interface CreatorSettings {
   replyFilterMuted: string;
   /** Quote-count link on a post's page. */
   showQuotes: boolean;
+  /** Look: 'x', a preset id or 'custom' (see theme/palette.ts). */
+  theme: string;
+  /** Background colour for the 'custom' theme. */
+  themeColor: string;
+  /** 'none', a gradient id or 'image'. */
+  backdrop: string;
+  /** 0–90. */
+  backdropDim: number;
 }
 
 const FALLBACK: CreatorSettings = {
@@ -27,6 +35,10 @@ const FALLBACK: CreatorSettings = {
   replyFilterAllow: '',
   replyFilterMuted: '',
   showQuotes: true,
+  theme: 'x',
+  themeColor: '#1e2a38',
+  backdrop: 'none',
+  backdropDim: 55,
 };
 
 const MODES: readonly ReplyFilterMode[] = ['badge', 'collapse', 'hide'];
@@ -50,6 +62,11 @@ export function coerceSettings(raw: unknown): CreatorSettings {
     replyFilterAllow: text('replyFilterAllow'),
     replyFilterMuted: text('replyFilterMuted'),
     showQuotes: bool('showQuotes'),
+    theme: typeof r.theme === 'string' && /^[a-z-]{1,20}$/.test(r.theme) ? r.theme : FALLBACK.theme,
+    themeColor: typeof r.themeColor === 'string' && /^#[0-9a-f]{6}$/i.test(r.themeColor) ? r.themeColor : FALLBACK.themeColor,
+    backdrop: typeof r.backdrop === 'string' && /^[a-z-]{1,20}$/.test(r.backdrop) ? r.backdrop : FALLBACK.backdrop,
+    backdropDim:
+      typeof r.backdropDim === 'number' && Number.isFinite(r.backdropDim) ? Math.min(Math.max(r.backdropDim, 0), 90) : FALLBACK.backdropDim,
   };
 }
 
