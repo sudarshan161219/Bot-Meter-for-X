@@ -8,9 +8,10 @@
 //     The link has "entry.<number>=..." for each field: copy those numbers below.
 //  3. FORM_ID is the long id in the link: docs.google.com/forms/d/e/<FORM_ID>/viewform
 // Until FORM_ID is set, the page shows only the goodbye and help links.
+// "Bot Meter uninstall feedback" (owned by @buildwithSud's Google account).
 const FEEDBACK_FORM = {
-  FORM_ID: '',
-  fields: { reason: 'entry.0', details: 'entry.0', version: 'entry.0' },
+  FORM_ID: '1FAIpQLSePVovw9SaHYTGlm3ahlY1s8kbOU7uTMYz9q7oCSLRFm_UdeQ',
+  fields: { reason: 'entry.511760839', details: 'entry.1375710297', version: 'entry.2059318882' },
 };
 
 (() => {
